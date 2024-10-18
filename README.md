@@ -1,6 +1,6 @@
 # Sin titulo aún
 
-## Description
+## Descripción
 
 Pronto...
 
@@ -13,7 +13,7 @@ Oliver Bueno 15-10192
 
 El proyecto se desarrola con la API Three.js.
 
-## Sistema operativo de dasarrollo
+## Sistema operativo de desarrollo
 
 Windows 11.
 
