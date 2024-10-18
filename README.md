@@ -11,13 +11,13 @@ Oliver Bueno 15-10192
 
 ## API Usada
 
-El proyecto se desarrola con la API Three.js.
+El proyecto se desarrolla con la API Three.js.
 
 ## Sistema operativo de desarrollo
 
 Windows 11.
 
-## Instrucciones para correr la aplicación
+## Instrucciones para correr el proyecto
 
 - Paso 1: Clonar el repositorio
 - Paso 2: Instalar dependencias
