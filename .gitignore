@@ -1,0 +1,18 @@
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Entornos
+.env
+
+# Directorio de caché
+.cache/
+
+# Archivos temporales
+*.tmp
+
+# Carpetas de compilación
+dist/
+build/

@@ -1,0 +1,17 @@
+{
+	"name": "proyecto_compu_grafica",
+	"version": "1.0.0",
+	"description": "Pronto...",
+	"main": "index.js",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"three": "^0.169.0",
+		"vite": "^5.4.9"
+	}
+}
