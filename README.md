@@ -6,7 +6,7 @@ Pronto...
 
 ## Autores
 
-Jose Alfonzo 17-10012
+Jose Alfonzo 17-10012  
 Oliver Bueno 15-10192
 
 ## API Usada
