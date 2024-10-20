@@ -36,6 +36,7 @@ const createPlane = () => {
 	
 	// Se asignan los materiales
     const plane = new THREE.Mesh(geometry, materials);
+	plane.rotation.x = -Math.PI / 2;
 
 
 	// Se divide el plano en segmentos y se asignan los materiales
@@ -54,12 +55,8 @@ const createPlane = () => {
 	for(let i = 17 ; i < 22; i++) {
 		geometry.addGroup((i-1)*40*6, 18*6, 2);
 	}
-
-    
-
     
     return plane;
 
 }
-
 export default createPlane;
