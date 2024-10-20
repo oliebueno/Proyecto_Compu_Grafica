@@ -28,9 +28,9 @@ const createPlane = () => {
 
 	// Se crean materiales para cada textura
 	const materials = [
-		new THREE.MeshBasicMaterial({ map: texture_1, side: THREE.DoubleSide}), // Textura 0
-		new THREE.MeshBasicMaterial({ map: texture_2, side: THREE.DoubleSide}), // Textura 1
-		new THREE.MeshBasicMaterial({ map: texture_3, side: THREE.DoubleSide}), // Textura 2
+		new THREE.MeshPhongMaterial({ map: texture_1, side: THREE.DoubleSide}), // Textura 0
+		new THREE.MeshPhongMaterial({ map: texture_2, side: THREE.DoubleSide}), // Textura 1
+		new THREE.MeshPhongMaterial({ map: texture_3, side: THREE.DoubleSide}), // Textura 2
 
 	]
 	

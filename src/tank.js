@@ -32,7 +32,7 @@ const createTankBody = () => {
 	tankBodyGeometry.setIndex(new THREE.BufferAttribute(tankBodyFace, 1));
 
 	// Material del cuerpo del tanque
-	const tankBodyMaterial = new THREE.MeshBasicMaterial({color: 0x00FF00, side: THREE.DoubleSide});
+	const tankBodyMaterial = new THREE.MeshStandardMaterial({color: 0x00FF00, side: THREE.DoubleSide});
 	const tankBody = new THREE.Mesh(tankBodyGeometry, tankBodyMaterial);
 
 	return tankBody;
