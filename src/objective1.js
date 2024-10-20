@@ -1,15 +1,11 @@
 import * as THREE from 'three';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
-
 const createObjective1 = () => {
-	const Objective1BodyGeometry = new THREE.BufferGeometry();
+    const textureLoader = new THREE.TextureLoader();
     const loaderDDS = new DDSLoader();
-    // Textura 1: Grama baja de mar
-	const texture_1 = loaderDDS.load('src/texture/bottom_sea1b.dds');
-	texture_1.wrapS = THREE.RepeatWrapping;
-	texture_1.wrapT = THREE.RepeatWrapping;
-	texture_1.repeat.set(1, 1);
+	const Objective1BodyGeometry = new THREE.BufferGeometry();
+    
 	const Objective1BodyVertices = new Float32Array([
 		// Vertices del objetivo1
 		-8, -8, 8,    // V0: Vértice inferior izquierdo tracero
@@ -37,8 +33,13 @@ const createObjective1 = () => {
 	Objective1BodyGeometry.setIndex(new THREE.BufferAttribute(Objective1BodyFace, 1));
 
 	// Material del cuerpo del Objective1
-	const Objective1BodyMaterial = new THREE.MeshStandardMaterial({color: 0xFFA500, side: THREE.DoubleSide});
-	
+	//const Objective1BodyMaterial = new THREE.MeshStandardMaterial({color: 0xFFA500, side: THREE.DoubleSide});
+	const texture_1 = loaderDDS.load('src/texture/asfalt_road_q3_dark.dds');
+    texture_1.wrapS = THREE.RepeatWrapping;
+	texture_1.wrapT = THREE.RepeatWrapping;
+	texture_1.repeat.set(1, 1);
+
+    const Objective1BodyMaterial = new THREE.MeshPhongMaterial({ map: texture_1, side: THREE.DoubleSide });
     const Objective1Body = new THREE.Mesh(Objective1BodyGeometry, Objective1BodyMaterial);
 
     return Objective1Body;
