@@ -4,7 +4,12 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Crear la escena
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB);
+
+// Cargar la imagen de fondo
+const loader = new THREE.TextureLoader();
+loader.load('src/texture/cielo.jpg', function(texture) {
+    scene.background = texture;
+});
 
 // Crear la camara
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -20,7 +25,7 @@ const plane = createPlane();
 scene.add(plane);
 
 // Posición de la camara
-camera.position.set(0, 5, 200);
+camera.position.set(0, 5, 400);
 
 // Configurar los controles de órbita
 const controls = new OrbitControls(camera, renderer.domElement);
