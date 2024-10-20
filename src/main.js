@@ -20,6 +20,7 @@ const canvas = document.getElementById('myCanvas')
 const renderer = new THREE.WebGLRenderer({canvas: canvas});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 
 // Añadir el plano
@@ -27,26 +28,39 @@ const plane = createPlane();
 plane.receiveShadow = true;
 scene.add(plane);
 
-
+// Añadir el tanque
 const tankBody = createTankBody();
-tankBody.position.set(0, 10, 0);
+tankBody.position.set(0, 8, 0);
 tankBody.castShadow = true;
 scene.add(tankBody);
 
 // Añadir luz ambiental
-const ambientLight = new THREE.AmbientLight(0x404040); 
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
 // Añadir luz direccional
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5); 
-directionalLight.position.set(50, 130, 500);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight.position.set(-350, 300, 100);
 directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width = 2048;
+directionalLight.shadow.mapSize.height = 2048;
+directionalLight.shadow.camera.near = 10;
+directionalLight.shadow.camera.far = 1000;
+directionalLight.shadow.camera.left = -250;
+directionalLight.shadow.camera.right = 250;
+directionalLight.shadow.camera.top = 250;
+directionalLight.shadow.camera.bottom = -250;
 scene.add(directionalLight);
 
-// Visualizar la cámara de sombras
+// Visualizar la cámara de sombras (opcional)
 const shadowHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
 scene.add(shadowHelper);
 
+// Añadir una luz puntual para asegurarse de que las sombras están correctamente configuradas
+const pointLight = new THREE.PointLight(0xff0000, 1, 100);
+pointLight.position.set(0, 50, 50);
+pointLight.castShadow = true;
+scene.add(pointLight);
 
 // Posición de la camara
 camera.position.set(0, 150, 400);
