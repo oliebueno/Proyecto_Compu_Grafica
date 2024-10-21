@@ -152,17 +152,18 @@ function animate() {
         turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
     }
 
-    // Rotar la torreta
-    if (keyStates['KeyW']) { // Tecla A para rotar a la izquierda
+    // Mover el cañón hacia arriba y hacia abajo
+    if (keyStates['KeyW']) { // Tecla W para mover el cañón hacia arriba
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.04); // Rotación alrededor del eje Y
-        turret.quaternion.multiplyQuaternions(quaternion, cannon.quaternion);
+        quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.04); // Rotación alrededor del eje X
+        cannon.quaternion.multiplyQuaternions(quaternion, cannon.quaternion);
     }
-    if (keyStates['KeyS']) { // Tecla D para rotar a la derecha
+    if (keyStates['KeyS']) { // Tecla S para mover el cañón hacia abajo
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -0.04); // Rotación alrededor del eje Y
-        turret.quaternion.multiplyQuaternions(quaternion, cannon.quaternion);
+        quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -0.04); // Rotación alrededor del eje X
+        cannon.quaternion.multiplyQuaternions(quaternion, cannon.quaternion);
     }
+
 
     controls.update();
     renderer.render(scene, camera);
