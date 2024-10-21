@@ -6,8 +6,8 @@ import createObjective2 from './objective2';
 import createObjective3 from './objective3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-const MAX_ROTATION_X = Math.PI / 4; // 45 grados
-const MIN_ROTATION_X = -Math.PI / 4; // -45 grados
+const MAX_ROTATION_X = Math.PI / 2; // 45 grados
+const MIN_ROTATION_X = -Math.PI / 2; // -45 grados
 
 // Crear la escena
 const scene = new THREE.Scene();
@@ -143,30 +143,28 @@ function animate() {
     // Rotar la torreta
     if (keyStates['KeyA']) { // Tecla A para rotar a la izquierda
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.04); // Rotación alrededor del eje Y
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.04);
         turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
     }
     if (keyStates['KeyD']) { // Tecla D para rotar a la derecha
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.04); // Rotación alrededor del eje Y
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.04);
         turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
     }
 
-    // Mover el cañón hacia arriba y hacia abajo
-    if (keyStates['KeyW']) { // Tecla W para mover el cañón hacia arriba
-        const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.04); // Rotación alrededor del eje X
-        cannon.quaternion.multiplyQuaternions(quaternion, cannon.quaternion);
-    }
-    if (keyStates['KeyS']) { // Tecla S para mover el cañón hacia abajo
-        const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -0.04); // Rotación alrededor del eje X
-        cannon.quaternion.multiplyQuaternions(quaternion, cannon.quaternion);
-    }
-
-
+	// Rotar y limitar la rotación del cañón
+	if (keyStates['KeyW']) { // Tecla W para mover el cañón hacia arriba
+		if (cannon.rotation.x + 0.04 <= MAX_ROTATION_X) {
+			cannon.rotation.x += 0.04;
+		}
+	}
+	if (keyStates['KeyS']) { // Tecla S para mover el cañón hacia abajo
+		if (cannon.rotation.x - 0.04 >= MIN_ROTATION_X) {
+			cannon.rotation.x -= 0.04;
+		}
+	}
+	
     controls.update();
     renderer.render(scene, camera);
 }
-
 animate();
