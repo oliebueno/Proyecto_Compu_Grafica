@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import createTurret from './torreta';
+import createCannon from './cannon';
 
 // Cuerpo del tanque
 
@@ -32,7 +34,16 @@ const createTankBody = () => {
 	const tankBodyMaterial = new THREE.MeshStandardMaterial({color: 0x00FF00, side: THREE.DoubleSide});
 	const tankBody = new THREE.Mesh(tankBodyGeometry, tankBodyMaterial);
 
-	return tankBody;
+	// Crear torreta
+	const turret = createTurret();
+	tankBody.add(turret);
+	
+
+	// Crear cañon
+	const cannon = createCannon();
+    turret.add(cannon);
+
+	return { tankBody, turret };
 }
 
 export default createTankBody;

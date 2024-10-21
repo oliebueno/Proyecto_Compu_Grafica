@@ -6,6 +6,9 @@ import createObjective2 from './objective2';
 import createObjective3 from './objective3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
+const MAX_ROTATION_X = Math.PI / 4; // 45 grados
+const MIN_ROTATION_X = -Math.PI / 4; // -45 grados
+
 // Crear la escena
 const scene = new THREE.Scene();
 
@@ -32,7 +35,7 @@ plane.receiveShadow = true;
 scene.add(plane);
 
 // Añadir el tanque
-const tankBody = createTankBody();
+const {tankBody, turret} = createTankBody();
 tankBody.position.set(0, 8, 0);
 tankBody.castShadow = true;
 scene.add(tankBody);
@@ -73,8 +76,10 @@ Objective3_2Body.position.set(-121, 50, 270);
 Objective3_2Body.castShadow = true;
 scene.add(Objective3_2Body);
 
+
+
 // Añadir luz ambiental
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
 // Añadir luz direccional
@@ -126,13 +131,25 @@ function animate() {
     }
     if (keyStates['ArrowLeft']) {
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.05);
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.05); // Rotación alrededor del eje Y
         tankBody.applyQuaternion(quaternion);
     }
     if (keyStates['ArrowRight']) {
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.05);
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.05); // Rotación alrededor del eje Y
         tankBody.applyQuaternion(quaternion);
+    }
+
+    // Rotar la torreta
+    if (keyStates['KeyA']) { // Tecla A para rotar a la izquierda
+        const quaternion = new THREE.Quaternion();
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.04); // Rotación alrededor del eje Y
+        turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
+    }
+    if (keyStates['KeyD']) { // Tecla D para rotar a la derecha
+        const quaternion = new THREE.Quaternion();
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.04); // Rotación alrededor del eje Y
+        turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
     }
 
     controls.update();
