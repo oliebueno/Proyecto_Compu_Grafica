@@ -76,7 +76,7 @@ const createCannon = () => {
 
     // Crear la malla del cañón
     const cannon = new THREE.Mesh(geometry, material);
-    cannon.position.set(0, 0, -20);
+    cannon.position.set(0, 0, 0);
 	
 	// rotar el material
 	cannon.rotation.x = Math.PI / 2;
