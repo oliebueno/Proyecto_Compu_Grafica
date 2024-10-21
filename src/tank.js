@@ -43,7 +43,7 @@ const createTankBody = () => {
 	const cannon = createCannon();
     turret.add(cannon);
 
-	return { tankBody, turret };
+	return { tankBody, turret, cannon };
 }
 
 export default createTankBody;
