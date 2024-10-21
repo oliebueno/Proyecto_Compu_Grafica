@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import createPlane from './plane';
 import createTankBody from './tank';
+import createObjective1 from './objective1';
+import createObjective2 from './objective2';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Crear la escena
@@ -33,6 +35,20 @@ const tankBody = createTankBody();
 tankBody.position.set(0, 8, 0);
 tankBody.castShadow = true;
 scene.add(tankBody);
+
+// Añadir el objective1
+
+const Objective1Body = createObjective1();
+Objective1Body.position.set(45, 8, -70);
+Objective1Body.castShadow = true;
+scene.add(Objective1Body);
+
+// Añadir el objective2
+
+const Objective2Body = createObjective2();
+Objective2Body.position.set(-48,0, 70);
+Objective2Body.castShadow = true;
+scene.add(Objective2Body);
 
 // Añadir luz ambiental
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);

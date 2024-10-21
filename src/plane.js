@@ -18,7 +18,7 @@ const createPlane = () => {
 	texture_2.wrapT = THREE.RepeatWrapping;
 	texture_2.repeat.set(1, 1);
 
-	// Textura 2: Asfalto
+	// Textura 3: Asfalto
 	const texture_3 = loaderDDS.load('src/texture/asfalt_road_q3_dark.dds')
 	texture_3.wrap4 = THREE.RepeatWrapping;
 	texture_3.wrap4 = THREE.RepeatWrapping;
