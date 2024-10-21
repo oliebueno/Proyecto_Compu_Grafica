@@ -3,6 +3,7 @@ import createPlane from './plane';
 import createTankBody from './tank';
 import createObjective1 from './objective1';
 import createObjective2 from './objective2';
+import createObjective3 from './objective3';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Crear la escena
@@ -15,7 +16,7 @@ loader.load('src/texture/cielo.jpg', function(texture) {
 });
 
 // Crear la camara
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
 
 // Crear el render
 const canvas = document.getElementById('myCanvas')
@@ -37,18 +38,40 @@ tankBody.castShadow = true;
 scene.add(tankBody);
 
 // Añadir el objective1
-
 const Objective1Body = createObjective1();
-Objective1Body.position.set(45, 8, -70);
+Objective1Body.position.set(121, 50, -70);
 Objective1Body.castShadow = true;
 scene.add(Objective1Body);
 
-// Añadir el objective2
+// Añadir el objective1_2
+const Objective1_2Body = createObjective1();
+Objective1_2Body.position.set(121, 50, 100);
+Objective1_2Body.castShadow = true;
+scene.add(Objective1_2Body);
 
+// Añadir el objective1_3
+const Objective1_3Body = createObjective1();
+Objective1_3Body.position.set(121, 50, 270);
+Objective1_3Body.castShadow = true;
+scene.add(Objective1_3Body);
+
+// Añadir el objective2
 const Objective2Body = createObjective2();
-Objective2Body.position.set(-48,0, 70);
+Objective2Body.position.set(-300, 0, -300);
 Objective2Body.castShadow = true;
 scene.add(Objective2Body);
+
+// Añadir el objective3
+const Objective3Body = createObjective3();
+Objective3Body.position.set(-121, 50, 100);
+Objective3Body.castShadow = true;
+scene.add(Objective3Body);
+
+// Añadir el objective3_2
+const Objective3_2Body = createObjective3();
+Objective3_2Body.position.set(-121, 50, 270);
+Objective3_2Body.castShadow = true;
+scene.add(Objective3_2Body);
 
 // Añadir luz ambiental
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -56,19 +79,19 @@ scene.add(ambientLight);
 
 // Añadir luz direccional
 const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight.position.set(-350, 300, 100);
+directionalLight.position.set(-350, 300, -50);
 directionalLight.castShadow = true;
 directionalLight.shadow.mapSize.width = 2048;
 directionalLight.shadow.mapSize.height = 2048;
 directionalLight.shadow.camera.near = 10;
 directionalLight.shadow.camera.far = 1000;
-directionalLight.shadow.camera.left = -250;
-directionalLight.shadow.camera.right = 250;
-directionalLight.shadow.camera.top = 250;
-directionalLight.shadow.camera.bottom = -250;
+directionalLight.shadow.camera.left = -600;
+directionalLight.shadow.camera.right = 600;
+directionalLight.shadow.camera.top = 600;
+directionalLight.shadow.camera.bottom = -600;
 scene.add(directionalLight);
 
-// Visualizar la cámara de sombras (opcional)
+// Visualizar la cámara de sombras
 const shadowHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
 scene.add(shadowHelper);
 
@@ -78,9 +101,9 @@ pointLight.position.set(0, 50, 50);
 pointLight.castShadow = true;
 scene.add(pointLight);
 
-// Posición de la camara
-camera.position.set(0, 150, 400);
-camera.lookAt(new THREE.Vector3(0, 0, 0)); 
+// Posición de la cámara
+camera.position.set(0, 300, 1000);
+camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 // Configurar los controles de órbita
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -88,14 +111,8 @@ controls.update();
 
 // Captura de eventos del teclado
 const keyStates = {};
-
-document.addEventListener('keydown', (event) => {
-    keyStates[event.code] = true;
-});
-
-document.addEventListener('keyup', (event) => {
-    keyStates[event.code] = false;
-});
+document.addEventListener('keydown', (event) => { keyStates[event.code] = true; });
+document.addEventListener('keyup', (event) => { keyStates[event.code] = false; });
 
 function animate() {
     requestAnimationFrame(animate);
