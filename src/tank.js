@@ -35,7 +35,11 @@ const createTankBody = () => {
 	const tankBodyMaterial = new THREE.MeshStandardMaterial({color: 0x00FF00, side: THREE.DoubleSide});
 	const tankBody = new THREE.Mesh(tankBodyGeometry, tankBodyMaterial);
 
-	// Crear torreta
+    // Añadir caja de colisión
+    tankBody.geometry.computeBoundingBox();
+    tankBody.boundingBox = new THREE.Box3().setFromObject(tankBody);
+	
+    // Crear torreta
 	const turret = createTurret();
 	tankBody.add(turret);
 	

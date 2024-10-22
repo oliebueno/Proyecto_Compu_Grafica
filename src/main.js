@@ -119,15 +119,46 @@ const keyStates = {};
 document.addEventListener('keydown', (event) => { keyStates[event.code] = true; });
 document.addEventListener('keyup', (event) => { keyStates[event.code] = false; });
 
+// Revision de colisiones
+function checkCollision(object1, object2) {
+    return object1.boundingBox.intersectsBox(object2.boundingBox);
+}
+
 function animate() {
     requestAnimationFrame(animate);
+    let moveTank = true;
+    const tankBox = new THREE.Box3().setFromObject(tankBody); // Actualizar bounding box del tanque
 
     // Movimiento del tanque
     if (keyStates['ArrowUp']) {
         tankBody.translateZ(-1);
+        tankBox.setFromObject(tankBody); // Actualizar bounding box después del movimiento
+
+        [Objective1Body, Objective1_2Body, Objective1_3Body, Objective2Body, Objective3Body, Objective3_2Body].forEach(object => {
+            const objectBox = new THREE.Box3().setFromObject(object); // Actualizar bounding box del objetivo
+            if (tankBox.intersectsBox(objectBox)) {
+                moveTank = false;
+            }
+        });
+
+        if (!moveTank) {
+            tankBody.translateZ(1); // Deshacer el movimiento si hay colisión
+        }
     }
     if (keyStates['ArrowDown']) {
         tankBody.translateZ(1);
+       tankBox.setFromObject(tankBody); // Actualizar bounding box después del movimiento
+
+        [Objective1Body, Objective1_2Body, Objective1_3Body, Objective2Body, Objective3Body, Objective3_2Body].forEach(object => {
+            const objectBox = new THREE.Box3().setFromObject(object); // Actualizar bounding box del objetivo
+            if (tankBox.intersectsBox(objectBox)) {
+                moveTank = false;
+            }
+        });
+
+        if (!moveTank) {
+            tankBody.translateZ(-1); // Deshacer el movimiento si hay colisión
+        }
     }
     if (keyStates['ArrowLeft']) {
         const quaternion = new THREE.Quaternion();
