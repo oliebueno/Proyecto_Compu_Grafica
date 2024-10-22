@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import createTurret from './torreta';
 import createCannon from './cannon';
+import createCaterpillar from './orugas';
 
 // Cuerpo del tanque
 
@@ -42,6 +43,11 @@ const createTankBody = () => {
 	// Crear cañon
 	const cannon = createCannon();
     turret.add(cannon);
+
+	// Crear orugas
+	const {caterpillarD, caterpillarI} = createCaterpillar();
+    tankBody.add(caterpillarD);
+	tankBody.add(caterpillarI);
 
 	return { tankBody, turret, cannon };
 }
