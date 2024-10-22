@@ -56,7 +56,8 @@ const createTurret = () => {
 
     // Crear la malla de la torreta
     const turret = new THREE.Mesh(geometry, material);
-    turret.position.set(0, 12, -20); // Ajusta la altura según la estructura del tanque
+    turret.position.set(0, 12, -20);
+	turret.rotation.y = Math.PI 
 
     return turret;
 };
