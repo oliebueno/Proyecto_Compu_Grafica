@@ -48,8 +48,8 @@ const createForm = () => {
     texture_1.wrapT = THREE.RepeatWrapping;
     texture_1.repeat.set(1, 1);
 
-    // Crear el material de la pirámide utilizando MeshPhongMaterial
-    const bulletBodyMaterial = new THREE.MeshPhongMaterial({ map: texture_1, side: THREE.DoubleSide });
+    // Crear el material de la pirámide
+    const bulletBodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide });
     const bulletBody = new THREE.Mesh(bulletBodyGeometry, bulletBodyMaterial);
 
     return bulletBody;
@@ -61,6 +61,9 @@ const createForm = () => {
 		lBullet.position.copy(mountPoint.getWorldPosition(new THREE.Vector3()));
 		lBullet.quaternion.copy(mountPoint.getWorldQuaternion(new THREE.Quaternion()));
 		lBullet.type = 'linear';
+
+		// Crear AABB para la bala
+		lBullet.box = new THREE.Box3().setFromObject(lBullet);
 		
 		return lBullet;
 	}
@@ -73,5 +76,9 @@ export function createGravityBullet(mountPoint) {
     gBullet.velocity = new THREE.Vector3(0, 0, -90).applyQuaternion(gBullet.quaternion);
     gBullet.gravity = new THREE.Vector3(0, -9.81, 0);
     gBullet.type = 'gravity';
+
+    // Crear AABB para la bala
+    gBullet.box = new THREE.Box3().setFromObject(gBullet);
+	
     return gBullet;
 }

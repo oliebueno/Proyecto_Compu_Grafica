@@ -50,7 +50,7 @@ const createObjective2 = () => {
     texture_1.repeat.set(1, 1);
 
     // Crear el material de la pirámide utilizando MeshPhongMaterial
-    const Objective2BodyMaterial = new THREE.MeshPhongMaterial({ map: texture_1, side: THREE.DoubleSide });
+    const Objective2BodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide });
     const Objective2Body = new THREE.Mesh(Objective2BodyGeometry, Objective2BodyMaterial);
 
     return Objective2Body;

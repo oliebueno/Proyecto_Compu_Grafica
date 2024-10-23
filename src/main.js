@@ -4,6 +4,7 @@ import createTankBody from './tank';
 import createObjective1 from './objective1';
 import createObjective2 from './objective2';
 import createObjective3 from './objective3';
+import createOval from './ballon';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -79,7 +80,35 @@ Objective3_2Body.position.set(-121, 50, 270);
 Objective3_2Body.castShadow = true;
 scene.add(Objective3_2Body);
 
+// Añadir blanco 1
+const ballon_1 = createOval()
+ballon_1.position.set(0, 80, 0);
+ballon_1.castShadow = true;
+scene.add(ballon_1);
 
+// Añadir blanco 2
+const ballon_2 = createOval()
+ballon_2.position.set(110, 180, -50);
+ballon_2.castShadow = true;
+scene.add(ballon_2);
+
+// Añadir blanco 3
+const ballon_3 = createOval()
+ballon_3.position.set(-310, 180, -150);
+ballon_3.castShadow = true;
+scene.add(ballon_3);
+
+// Añadir blanco
+const ballon_4 = createOval()
+ballon_4.position.set(410, 380, -200);
+ballon_4.castShadow = true;
+scene.add(ballon_4);
+
+// Añadir blanco
+const ballon_5 = createOval()
+ballon_5.position.set(-310, 380, 250);
+ballon_5.castShadow = true;
+scene.add(ballon_5);
 
 // Añadir luz ambiental
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -128,6 +157,19 @@ function shootBullet(type) {
     bullets.push(bullet);
     scene.add(bullet);
 }
+
+// Función para detectar colisiones
+function checkCollisionAABB(box1, box2) {
+    // Verificar colisión en el eje X
+    const collisionX = box1.max.x >= box2.min.x && box2.max.x >= box1.min.x;
+    // Verificar colisión en el eje Y
+    const collisionY = box1.max.y >= box2.min.y && box2.max.y >= box1.min.y;
+    // Verificar colisión en el eje Z
+    const collisionZ = box1.max.z >= box2.min.z && box2.max.z >= box1.min.z;
+
+    return collisionX && collisionY && collisionZ;
+}
+
 
 function updateBullets() {
     bullets.forEach((bullet, index) => {
