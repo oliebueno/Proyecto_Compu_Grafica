@@ -1,41 +1,90 @@
 import * as THREE from 'three';
+import createTurret from './torreta';
+import createCannon from './cannon';
+import createCaterpillar from './orugas';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 // Cuerpo del tanque
 
 const createTankBody = () => {
 	const tankBodyGeometry = new THREE.BufferGeometry();
 	const tankBodyVertices = new Float32Array([
-		// Vertices del cuerpo del tanque
-		-15, -8, 0,    // V0: Vértice inferior izquierdo tracero
-		15, -8, 0,     // V1: Vértice inferior derecho tracero
-		-15, 8, 0,     // V2: Vértice superior derecho tracero
-		15, 8, 0,      // V3: Vértice superior izquierdo tracero
-		-15, -8, -40,  // V4: Vértice inferior izquierdo delantero
-		15, -8, -40,   // V5: Vértice inferior derecho delantero
-		-15, 8, -40,   // V6: Vértice superior derecho delantero
-		15, 8, -40,    // V7: Vértice superior izquierdo delantero
+ // Vertices del cuerpo del tanque
+        // Cara trasera
+        -15, -8, 0,   15, -8, 0,  -15, 8, 0,
+        15, -8, 0,  -15, 8, 0,   15, 8, 0,
+        // Cara delantera
+        -15, -8, -40,   15, -8, -40,  -15, 8, -40, 
+        15, -8, -40,  -15, 8, -40,   15, 8, -40,
+        // Cara inferior
+        -15, -8, 0,   15, -8, 0,  -15, -8, -40,
+        15, -8, 0,  -15, -8, -40,   15, -8, -40,
+        // Cara superior
+        -15, 8, 0,   15, 8, 0,  -15, 8, -40,
+        15, 8, 0,  -15, 8, -40,   15, 8, -40,
+        // Cara izquierda
+        -15, -8, 0,  -15, 8, 0,  -15, -8, -40,
+        -15, 8, 0,  -15, -8, -40,  -15, 8, -40,
+        // Cara derecha
+        15, -8, 0,  15, 8, 0,  15, -8, -40,
+        15, 8, 0,  15, -8, -40,  15, 8, -40
+    ]);
 
-	]);
+	const tankUVs = new Float32Array([
+		// Coordenadas UV para cada triángulo
+		// Cara frontal
+		0, 0,  0, -1,  -1, 0,
+		1, 0,  0, 1,  0, 0,
+		// Cara trasera
+		0, 0,  0, -1,  -1, 0,
+		1, 0,  0, 1,  0, 0,
 	
-	const tankBodyFace = new Uint16Array([
-		// Caras del cuerpo del tanque
-		0, 1, 2,  1, 2, 3, // cara trasera
-		4, 5, 6,  5, 6, 7, // cara delantera
-		0, 1, 4,  1, 4, 5, // cara inferior
-		2, 3, 6,  3, 6, 7, // cara superior
-		0, 2, 4,  2, 4, 6, // cara izquierdo
-		1, 3, 5,  3, 5, 7, // cara derecha
-
+		// Cara inferior
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1,
+	
+		// Cara superior
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1,
+	
+		// Cara izquierda
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1,
+	
+		// Cara derecha
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1
 	]);
 
 	tankBodyGeometry.setAttribute('position', new THREE.BufferAttribute(tankBodyVertices, 3));
-	tankBodyGeometry.setIndex(new THREE.BufferAttribute(tankBodyFace, 1));
+	tankBodyGeometry.setAttribute('uv', new THREE.BufferAttribute(tankUVs, 2));
+
+	// Cargar la textura
+    const loaderDDS = new DDSLoader();
+    const texture_1 = loaderDDS.load('src/texture/tank.dds');
+    texture_1.wrapS = THREE.RepeatWrapping;
+    texture_1.wrapT = THREE.RepeatWrapping;
+    texture_1.repeat.set(1, 1);
 
 	// Material del cuerpo del tanque
-	const tankBodyMaterial = new THREE.MeshStandardMaterial({color: 0x00FF00, side: THREE.DoubleSide});
+	const tankBodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide});
 	const tankBody = new THREE.Mesh(tankBodyGeometry, tankBodyMaterial);
 
-	return tankBody;
+	// Crear torreta
+	const turret = createTurret();
+	tankBody.add(turret);
+	
+
+	// Crear cañon
+	const {cannon, mountPoint} = createCannon();
+    turret.add(cannon);
+
+	// Crear orugas
+	const {caterpillarD, caterpillarI} = createCaterpillar();
+    tankBody.add(caterpillarD);
+	tankBody.add(caterpillarI);
+
+	return { tankBody, turret, cannon, mountPoint};
 }
 
 export default createTankBody;
