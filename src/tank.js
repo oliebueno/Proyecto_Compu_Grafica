@@ -9,6 +9,7 @@ import createCaterpillar from './orugas';
 const createTankBody = () => {
 	const tankBodyGeometry = new THREE.BufferGeometry();
 	const tankBodyVertices = new Float32Array([
+		
  // Vertices del cuerpo del tanque
         // Cara trasera
         -15, -8, 0,   15, -8, 0,  -15, 8, 0,
