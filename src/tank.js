@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import createTurret from './torreta';
 import createCannon from './cannon';
 import createCaterpillar from './orugas';
-import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
+
 
 // Cuerpo del tanque
 
@@ -70,7 +70,11 @@ const createTankBody = () => {
 	const tankBodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide});
 	const tankBody = new THREE.Mesh(tankBodyGeometry, tankBodyMaterial);
 
-	// Crear torreta
+    // Añadir caja de colisión
+    tankBody.geometry.computeBoundingBox();
+    tankBody.boundingBox = new THREE.Box3().setFromObject(tankBody);
+	
+    // Crear torreta
 	const turret = createTurret();
 	tankBody.add(turret);
 	
@@ -84,7 +88,5 @@ const createTankBody = () => {
     tankBody.add(caterpillarD);
 	tankBody.add(caterpillarI);
 
-	return { tankBody, turret, cannon, mountPoint};
-}
 
 export default createTankBody;

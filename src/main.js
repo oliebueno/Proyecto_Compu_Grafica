@@ -8,17 +8,6 @@ import createOval from './ballon';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-const MAX_ROTATION_X = Math.PI / 2; 
-const MIN_ROTATION_X = -Math.PI / 2;
-
-const balloonSound = new Audio('src/Audios/explosion.mp3');
-const tankSound = new Audio('src/Audios/tanque.mp3');
-tankSound.loop = true;
-tankSound.volume = 0.2;
-const cannonSound = new Audio('src/Audios/disparo.mp3');
-cannonSound.volume = 0.3;
-
-const bullets = [];
 
 // Crear la escena
 const scene = new THREE.Scene();
@@ -46,7 +35,7 @@ plane.receiveShadow = true;
 scene.add(plane);
 
 // Añadir el tanque
-const {tankBody, turret, cannon, mountPoint} = createTankBody();
+
 tankBody.position.set(0, 18, 450);
 tankBody.castShadow = true;
 scene.add(tankBody);
@@ -233,32 +222,19 @@ const keyStates = {};
 document.addEventListener('keydown', (event) => { keyStates[event.code] = true; });
 document.addEventListener('keyup', (event) => { keyStates[event.code] = false; });
 
-document.addEventListener('keydown', (event) => {
-    if (event.code === 'KeyQ') {
-		cannonSound.currentTime = 0;
-		cannonSound.play();
-        shootBullet('linear');
-    } else if (event.code === 'KeyE') {
-		cannonSound.currentTime = 0;
-		cannonSound.play();
-        shootBullet('gravity');
-    }
-});
 
 
 function animate() {
     requestAnimationFrame(animate);
+    let moveTank = true;
+    const tankBox = new THREE.Box3().setFromObject(tankBody); // Actualizar bounding box del tanque
 
     // Movimiento del tanque
     let isMoving = false;
 
     if (keyStates['ArrowUp']) {
         tankBody.translateZ(-1);
-        isMoving = true; 
-    }
-    if (keyStates['ArrowDown']) {
-        tankBody.translateZ(1);
-        isMoving = true;
+
     }
     if (keyStates['ArrowLeft']) {
         const quaternion = new THREE.Quaternion();
@@ -286,28 +262,13 @@ function animate() {
     // Rotar la torreta
     if (keyStates['KeyA']) { // Tecla A para rotar a la izquierda
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.01);
-        turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
-    }
-    if (keyStates['KeyD']) { // Tecla D para rotar a la derecha
-        const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.01);
+
         turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
     }
 
 	// Rotar y limitar la rotación del cañón
 	if (keyStates['KeyW']) { // Tecla W para mover el cañón hacia arriba
-		if (cannon.rotation.x + 0.01 <= MAX_ROTATION_X) {
-			cannon.rotation.x += 0.01;
-		}
-	}
-	if (keyStates['KeyS']) { // Tecla S para mover el cañón hacia abajo
-		if (cannon.rotation.x - 0.01 >= MIN_ROTATION_X) {
-			cannon.rotation.x -= 0.01;
-		}
-	}
-	
-	updateBullets();
+
     controls.update();
     renderer.render(scene, camera);
 }
