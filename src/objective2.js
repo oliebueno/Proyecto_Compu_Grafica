@@ -53,6 +53,10 @@ const createObjective2 = () => {
     const Objective2BodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide });
     const Objective2Body = new THREE.Mesh(Objective2BodyGeometry, Objective2BodyMaterial);
 
+    // Añadir caja de colisión
+    Objective2Body.geometry.computeBoundingBox();
+    Objective2Body.boundingBox = new THREE.Box3().setFromObject(Objective2Body);
+    
     return Objective2Body;
 }
 

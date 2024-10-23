@@ -65,6 +65,10 @@ const Objective1BodyUVs = new Float32Array([
     const Objective1BodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide });
     const Objective1Body = new THREE.Mesh(Objective1BodyGeometry, Objective1BodyMaterial);
 
+    // Añadir caja de colisión
+    Objective1Body.geometry.computeBoundingBox();
+    Objective1Body.boundingBox = new THREE.Box3().setFromObject(Objective1Body);
+    
     return Objective1Body;
 }
 export default createObjective1;
