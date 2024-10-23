@@ -43,7 +43,7 @@ const createForm = () => {
 
     // Cargar la textura
     const loaderDDS = new DDSLoader();
-    const texture_1 = loaderDDS.load('src/texture/piramide.dds');
+    const texture_1 = loaderDDS.load('src/texture/balas.dds');
     texture_1.wrapS = THREE.RepeatWrapping;
     texture_1.wrapT = THREE.RepeatWrapping;
     texture_1.repeat.set(1, 1);
@@ -60,7 +60,7 @@ const createForm = () => {
 		const lBullet = createForm();
 		lBullet.position.copy(mountPoint.getWorldPosition(new THREE.Vector3()));
 		lBullet.quaternion.copy(mountPoint.getWorldQuaternion(new THREE.Quaternion()));
-		lBullet.velocity = new THREE.Vector3(0, 0, -5).applyQuaternion(lBullet.quaternion);
+		lBullet.velocity = new THREE.Vector3(0, 0, 5).applyQuaternion(lBullet.quaternion);
 		lBullet.type = 'linear';
 		
 		return lBullet;
