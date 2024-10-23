@@ -11,6 +11,13 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 const MAX_ROTATION_X = Math.PI / 2; 
 const MIN_ROTATION_X = -Math.PI / 2;
 
+const balloonSound = new Audio('src/Audios/explosion.mp3');
+const tankSound = new Audio('src/Audios/tanque.mp3');
+tankSound.loop = true;
+tankSound.volume = 0.2;
+const cannonSound = new Audio('src/Audios/disparo.mp3');
+cannonSound.volume = 0.3;
+
 const bullets = [];
 
 // Crear la escena
@@ -84,34 +91,49 @@ scene.add(Objective3_2Body);
 const ballon_1 = createOval()
 ballon_1.position.set(0, 80, 0);
 ballon_1.castShadow = true;
+ballon_1.box = new THREE.Box3().setFromObject(ballon_1);
 scene.add(ballon_1);
 
 // Añadir blanco 2
 const ballon_2 = createOval()
 ballon_2.position.set(110, 180, -50);
 ballon_2.castShadow = true;
+ballon_2.box = new THREE.Box3().setFromObject(ballon_2);
 scene.add(ballon_2);
 
 // Añadir blanco 3
 const ballon_3 = createOval()
 ballon_3.position.set(-310, 180, -150);
 ballon_3.castShadow = true;
+ballon_3.box = new THREE.Box3().setFromObject(ballon_3);
 scene.add(ballon_3);
 
 // Añadir blanco
 const ballon_4 = createOval()
 ballon_4.position.set(410, 380, -200);
 ballon_4.castShadow = true;
+ballon_4.box = new THREE.Box3().setFromObject(ballon_4);
 scene.add(ballon_4);
 
 // Añadir blanco
 const ballon_5 = createOval()
 ballon_5.position.set(-310, 380, 250);
 ballon_5.castShadow = true;
+ballon_5.box = new THREE.Box3().setFromObject(ballon_5);
 scene.add(ballon_5);
 
+// Arreglo de globlos
+const balloons = [];
+
+// Añadir globos
+balloons.push(ballon_1);
+balloons.push(ballon_2);
+balloons.push(ballon_3);
+balloons.push(ballon_4);
+balloons.push(ballon_5);
+
 // Añadir luz ambiental
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
 // Añadir luz direccional
@@ -127,10 +149,6 @@ directionalLight.shadow.camera.right = 600;
 directionalLight.shadow.camera.top = 600;
 directionalLight.shadow.camera.bottom = -600;
 scene.add(directionalLight);
-
-// Visualizar la cámara de sombras
-const shadowHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
-scene.add(shadowHelper);
 
 // Añadir una luz puntual para asegurarse de que las sombras están correctamente configuradas
 const pointLight = new THREE.PointLight(0xff0000, 1, 100);
@@ -170,31 +188,43 @@ function checkCollisionAABB(box1, box2) {
     return collisionX && collisionY && collisionZ;
 }
 
-
 function updateBullets() {
-    bullets.forEach((bullet, index) => {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const bullet = bullets[i];
+        bullet.box = new THREE.Box3().setFromObject(bullet);
+
         if (bullet.type === 'linear') {
-            bullet.translateZ(-5);
+            bullet.position.add(bullet.velocity.clone());
         } else if (bullet.type === 'gravity') {
             bullet.position.add(bullet.velocity.clone().multiplyScalar(0.1));
             bullet.velocity.add(bullet.gravity.clone().multiplyScalar(0.1));
-			// Calcular la dirección del movimiento
-			const direction = bullet.velocity.clone().normalize();
-			// Calculo de la rotación necesaria  para que la bala apunte  en la dirección del movimiento
+            const direction = bullet.velocity.clone().normalize();
             const up = new THREE.Vector3(0, 0, -1);
             const quaternion = new THREE.Quaternion().setFromUnitVectors(up, direction);
-            
-            // Aplicar la rotación a la pirámide
             bullet.quaternion.copy(quaternion);
+        }
 
+        // Comprobar colisiones con globos
+        for (let j = balloons.length - 1; j >= 0; j--) {
+            const balloon = balloons[j];
+            balloon.box.setFromObject(balloon);
+            if (checkCollisionAABB(bullet.box, balloon.box)) {
+                // Manejar la colisión
+				balloonSound.currentTime = 0;
+				balloonSound.play();
+                scene.remove (bullet);
+                bullets.splice(i, 1);
+                scene.remove(balloon);
+                balloons.splice(j, 1);
+            }
         }
 
         // Eliminar la bala si está demasiado lejos
         if (bullet.position.length() > 1000) {
             scene.remove(bullet);
-            bullets.splice(index, 1);
+            bullets.splice(i, 1); 
         }
-    });
+    }
 }
 
 
@@ -204,9 +234,13 @@ document.addEventListener('keydown', (event) => { keyStates[event.code] = true; 
 document.addEventListener('keyup', (event) => { keyStates[event.code] = false; });
 
 document.addEventListener('keydown', (event) => {
-    if (event.code === 'KeyQ') { // Tecla L para disparar bala lineal
+    if (event.code === 'KeyQ') {
+		cannonSound.currentTime = 0;
+		cannonSound.play();
         shootBullet('linear');
-    } else if (event.code === 'KeyE') { // Tecla G para disparar bala con gravedad
+    } else if (event.code === 'KeyE') {
+		cannonSound.currentTime = 0;
+		cannonSound.play();
         shootBullet('gravity');
     }
 });
@@ -216,44 +250,60 @@ function animate() {
     requestAnimationFrame(animate);
 
     // Movimiento del tanque
+    let isMoving = false;
+
     if (keyStates['ArrowUp']) {
         tankBody.translateZ(-1);
+        isMoving = true; 
     }
     if (keyStates['ArrowDown']) {
         tankBody.translateZ(1);
+        isMoving = true;
     }
     if (keyStates['ArrowLeft']) {
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.05); // Rotación alrededor del eje Y
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.03);
         tankBody.applyQuaternion(quaternion);
     }
     if (keyStates['ArrowRight']) {
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.05); // Rotación alrededor del eje Y
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.03);
         tankBody.applyQuaternion(quaternion);
+    }
+
+    // Reproducir o detener el sonido
+    if (isMoving) {
+        if (tankSound.paused) {
+            tankSound.play();
+        }
+    } else {
+        if (!tankSound.paused) {
+            tankSound.pause(); 
+            tankSound.currentTime = 0;
+        }
     }
 
     // Rotar la torreta
     if (keyStates['KeyA']) { // Tecla A para rotar a la izquierda
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.04);
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.01);
         turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
     }
     if (keyStates['KeyD']) { // Tecla D para rotar a la derecha
         const quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.04);
+        quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.01);
         turret.quaternion.multiplyQuaternions(quaternion, turret.quaternion);
     }
 
 	// Rotar y limitar la rotación del cañón
 	if (keyStates['KeyW']) { // Tecla W para mover el cañón hacia arriba
-		if (cannon.rotation.x + 0.04 <= MAX_ROTATION_X) {
-			cannon.rotation.x += 0.04;
+		if (cannon.rotation.x + 0.01 <= MAX_ROTATION_X) {
+			cannon.rotation.x += 0.01;
 		}
 	}
 	if (keyStates['KeyS']) { // Tecla S para mover el cañón hacia abajo
-		if (cannon.rotation.x - 0.04 >= MIN_ROTATION_X) {
-			cannon.rotation.x -= 0.04;
+		if (cannon.rotation.x - 0.01 >= MIN_ROTATION_X) {
+			cannon.rotation.x -= 0.01;
 		}
 	}
 	

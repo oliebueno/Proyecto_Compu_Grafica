@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import createTurret from './torreta';
 import createCannon from './cannon';
 import createCaterpillar from './orugas';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 // Cuerpo del tanque
 
@@ -29,10 +30,44 @@ const createTankBody = () => {
         15, 8, 0,  15, -8, -40,  15, 8, -40
     ]);
 
+	const tankUVs = new Float32Array([
+		// Coordenadas UV para cada triángulo
+		// Cara frontal
+		0, 0,  0, -1,  -1, 0,
+		1, 0,  0, 1,  0, 0,
+		// Cara trasera
+		0, 0,  0, -1,  -1, 0,
+		1, 0,  0, 1,  0, 0,
+	
+		// Cara inferior
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1,
+	
+		// Cara superior
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1,
+	
+		// Cara izquierda
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1,
+	
+		// Cara derecha
+		0, 0,  1, 0,  0, 1,
+		1, 0,  0, 1,  1, 1
+	]);
+
 	tankBodyGeometry.setAttribute('position', new THREE.BufferAttribute(tankBodyVertices, 3));
+	tankBodyGeometry.setAttribute('uv', new THREE.BufferAttribute(tankUVs, 2));
+
+	// Cargar la textura
+    const loaderDDS = new DDSLoader();
+    const texture_1 = loaderDDS.load('src/texture/tank.dds');
+    texture_1.wrapS = THREE.RepeatWrapping;
+    texture_1.wrapT = THREE.RepeatWrapping;
+    texture_1.repeat.set(1, 1);
 
 	// Material del cuerpo del tanque
-	const tankBodyMaterial = new THREE.MeshStandardMaterial({color: 0x00FF00, side: THREE.DoubleSide});
+	const tankBodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide});
 	const tankBody = new THREE.Mesh(tankBodyGeometry, tankBodyMaterial);
 
 	// Crear torreta

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 const createCannon = () => {
     const geometry = new THREE.BufferGeometry();
@@ -68,11 +69,15 @@ const createCannon = () => {
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
     geometry.setIndex(indices);
 
+		// Cargar la textura
+    const loaderDDS = new DDSLoader();
+    const texture_1 = loaderDDS.load('src/texture/canoon.dds');
+    texture_1.wrapS = THREE.RepeatWrapping;
+    texture_1.wrapT = THREE.RepeatWrapping;
+    texture_1.repeat.set(1, 1);
+
     // Crear el material del cañón
-    const material = new THREE.MeshStandardMaterial({
-        color: 0x0000FF,
-		side: THREE.DoubleSide,
-    });
+    const material = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide,});
 
     // Crear la malla del cañón
     const cannon = new THREE.Mesh(geometry, material);

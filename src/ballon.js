@@ -62,9 +62,6 @@ const createOval = () => {
 
 	oval.rotation.z = Math.PI / 2;
 
-    // Crear AABB para el ovalo
-    oval.box = new THREE.Box3().setFromObject(oval);
-
     return oval;
 };
 

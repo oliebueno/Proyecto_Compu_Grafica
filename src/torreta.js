@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 const createTurret = () => {
     // Parámetros para la esfera
@@ -51,8 +52,15 @@ const createTurret = () => {
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
     geometry.setIndex(indices);
 
+	// Cargar la textura
+    const loaderDDS = new DDSLoader();
+    const texture_1 = loaderDDS.load('src/texture/torreta.dds');
+    texture_1.wrapS = THREE.RepeatWrapping;
+    texture_1.wrapT = THREE.RepeatWrapping;
+    texture_1.repeat.set(1, 1);
+
     // Crear el material de la torreta
-    const material = new THREE.MeshStandardMaterial({ color: 0xFF0000}); // Verde
+    const material = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide});
 
     // Crear la malla de la torreta
     const turret = new THREE.Mesh(geometry, material);

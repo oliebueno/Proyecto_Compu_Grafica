@@ -60,10 +60,8 @@ const createForm = () => {
 		const lBullet = createForm();
 		lBullet.position.copy(mountPoint.getWorldPosition(new THREE.Vector3()));
 		lBullet.quaternion.copy(mountPoint.getWorldQuaternion(new THREE.Quaternion()));
+		lBullet.velocity = new THREE.Vector3(0, 0, -5).applyQuaternion(lBullet.quaternion);
 		lBullet.type = 'linear';
-
-		// Crear AABB para la bala
-		lBullet.box = new THREE.Box3().setFromObject(lBullet);
 		
 		return lBullet;
 	}
@@ -77,8 +75,5 @@ export function createGravityBullet(mountPoint) {
     gBullet.gravity = new THREE.Vector3(0, -9.81, 0);
     gBullet.type = 'gravity';
 
-    // Crear AABB para la bala
-    gBullet.box = new THREE.Box3().setFromObject(gBullet);
-	
     return gBullet;
 }
