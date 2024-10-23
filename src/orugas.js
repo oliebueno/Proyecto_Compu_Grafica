@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+
 const createCaterpillar = () => {
     const geometry = new THREE.BufferGeometry();
     const vertices = [];
@@ -67,12 +68,6 @@ const createCaterpillar = () => {
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
     geometry.setIndex(indices);
-
-    // Crear el material de la oruga
-    const material = new THREE.MeshStandardMaterial({
-        color: 0x00fff0,
-		side: THREE.DoubleSide,
-    });
 
     // Crear la malla de la oruga derecha
     const caterpillarD = new THREE.Mesh(geometry, material);

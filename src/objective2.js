@@ -4,7 +4,7 @@ import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 const createObjective2 = () => {
     const Objective2BodyGeometry = new THREE.BufferGeometry();
 
-    // Definir los vértices de la pirámide sin usar índices
+    // Definir los vértices de la pirámide
     const Objective2BodyVertices = new Float32Array([
         // Base de la pirámide
         -70, 0, -70,    70, 0, -70,   70, 0, 70,
@@ -50,7 +50,7 @@ const createObjective2 = () => {
     texture_1.repeat.set(1, 1);
 
     // Crear el material de la pirámide utilizando MeshPhongMaterial
-    const Objective2BodyMaterial = new THREE.MeshPhongMaterial({ map: texture_1, side: THREE.DoubleSide });
+    const Objective2BodyMaterial = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide });
     const Objective2Body = new THREE.Mesh(Objective2BodyGeometry, Objective2BodyMaterial);
     // Añadir caja de colisión
     Objective2Body.geometry.computeBoundingBox();
