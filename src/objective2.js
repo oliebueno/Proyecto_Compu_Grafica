@@ -4,7 +4,7 @@ import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 const createObjective2 = () => {
     const Objective2BodyGeometry = new THREE.BufferGeometry();
 
-    // Definir los vértices de la pirámide sin usar índices
+    // Definir los vértices de la pirámide
     const Objective2BodyVertices = new Float32Array([
         // Base de la pirámide
         -70, 0, -70,    70, 0, -70,   70, 0, 70,

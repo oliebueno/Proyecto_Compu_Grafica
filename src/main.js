@@ -4,10 +4,13 @@ import createTankBody from './tank';
 import createObjective1 from './objective1';
 import createObjective2 from './objective2';
 import createObjective3 from './objective3';
+import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-const MAX_ROTATION_X = Math.PI / 2; // 45 grados
-const MIN_ROTATION_X = -Math.PI / 2; // -45 grados
+const MAX_ROTATION_X = Math.PI / 2; 
+const MIN_ROTATION_X = -Math.PI / 2;
+
+const bullets = [];
 
 // Crear la escena
 const scene = new THREE.Scene();
@@ -35,7 +38,7 @@ plane.receiveShadow = true;
 scene.add(plane);
 
 // Añadir el tanque
-const {tankBody, turret, cannon} = createTankBody();
+const {tankBody, turret, cannon, mountPoint} = createTankBody();
 tankBody.position.set(0, 18, 450);
 tankBody.castShadow = true;
 scene.add(tankBody);
@@ -114,10 +117,58 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.update();
 
+// Función para disparar una bala
+function shootBullet(type) {
+    let bullet;
+    if (type === 'linear') {
+        bullet = createLinearBullet(mountPoint);
+    } else if (type === 'gravity') {
+        bullet = createGravityBullet(mountPoint);
+    }
+    bullets.push(bullet);
+    scene.add(bullet);
+}
+
+function updateBullets() {
+    bullets.forEach((bullet, index) => {
+        if (bullet.type === 'linear') {
+            bullet.translateZ(-5);
+        } else if (bullet.type === 'gravity') {
+            bullet.position.add(bullet.velocity.clone().multiplyScalar(0.1));
+            bullet.velocity.add(bullet.gravity.clone().multiplyScalar(0.1));
+			// Calcular la dirección del movimiento
+			const direction = bullet.velocity.clone().normalize();
+			// Calculo de la rotación necesaria  para que la bala apunte  en la dirección del movimiento
+            const up = new THREE.Vector3(0, 0, -1);
+            const quaternion = new THREE.Quaternion().setFromUnitVectors(up, direction);
+            
+            // Aplicar la rotación a la pirámide
+            bullet.quaternion.copy(quaternion);
+
+        }
+
+        // Eliminar la bala si está demasiado lejos
+        if (bullet.position.length() > 1000) {
+            scene.remove(bullet);
+            bullets.splice(index, 1);
+        }
+    });
+}
+
+
 // Captura de eventos del teclado
 const keyStates = {};
 document.addEventListener('keydown', (event) => { keyStates[event.code] = true; });
 document.addEventListener('keyup', (event) => { keyStates[event.code] = false; });
+
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'KeyQ') { // Tecla L para disparar bala lineal
+        shootBullet('linear');
+    } else if (event.code === 'KeyE') { // Tecla G para disparar bala con gravedad
+        shootBullet('gravity');
+    }
+});
+
 
 function animate() {
     requestAnimationFrame(animate);
@@ -164,6 +215,7 @@ function animate() {
 		}
 	}
 	
+	updateBullets();
     controls.update();
     renderer.render(scene, camera);
 }

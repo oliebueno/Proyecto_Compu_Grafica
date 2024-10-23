@@ -81,9 +81,13 @@ const createCannon = () => {
 	// rotar el material
 	cannon.rotation.x = Math.PI / 2;
 
+	// Punto de montaje
+	const mountPoint = new THREE.Object3D();
+	mountPoint.position.set(0, height, 0);
+	mountPoint.rotation.copy(cannon.rotation);
+	cannon.add(mountPoint);
 
-
-    return cannon;
+    return {cannon, mountPoint};
 };
 
 export default createCannon;

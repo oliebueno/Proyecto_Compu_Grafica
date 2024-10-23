@@ -41,7 +41,7 @@ const createTankBody = () => {
 	
 
 	// Crear cañon
-	const cannon = createCannon();
+	const {cannon, mountPoint} = createCannon();
     turret.add(cannon);
 
 	// Crear orugas
@@ -49,7 +49,7 @@ const createTankBody = () => {
     tankBody.add(caterpillarD);
 	tankBody.add(caterpillarI);
 
-	return { tankBody, turret, cannon };
+	return { tankBody, turret, cannon, mountPoint};
 }
 
 export default createTankBody;
