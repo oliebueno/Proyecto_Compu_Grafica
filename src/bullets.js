@@ -55,12 +55,12 @@ const createForm = () => {
     return bulletBody;
 
 }
-// Se crea la bala con movimiento rectilineaexport function createLinearBullet(mountPoint) {
+// Se crea la bala con movimiento rectilineo
 	export function createLinearBullet(mountPoint) {
 		const lBullet = createForm();
 		lBullet.position.copy(mountPoint.getWorldPosition(new THREE.Vector3()));
 		lBullet.quaternion.copy(mountPoint.getWorldQuaternion(new THREE.Quaternion()));
-		lBullet.velocity = new THREE.Vector3(0, 0, 5).applyQuaternion(lBullet.quaternion);
+		lBullet.velocity = new THREE.Vector3(0, 0, -5).applyQuaternion(lBullet.quaternion);
 		lBullet.type = 'linear';
 		
 		return lBullet;

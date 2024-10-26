@@ -29,6 +29,33 @@ loader.load('src/texture/cielo.jpg', function(texture) {
     scene.background = texture;
 });
 
+// Crear el skybox
+let skyboxMaterials = [];
+let texture_ft = new THREE.TextureLoader().load("src/texture/frente.png");
+let texture_bk = new THREE.TextureLoader().load("src/texture/atras.png");
+let texture_up = new THREE.TextureLoader().load("src/texture/arriba.png");
+let texture_dn = new THREE.TextureLoader().load("src/texture/abajo.png");
+let texture_rt = new THREE.TextureLoader().load("src/texture/derecha.png");
+let texture_lf = new THREE.TextureLoader().load("src/texture/izquierda.png");
+
+skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_rt }));
+skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_lf }));
+skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_up }));
+skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_dn }));
+skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_bk }));
+skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_ft }));
+
+for(let i = 0; i < skyboxMaterials.length; i++) {
+	skyboxMaterials[i].side = THREE.BackSide;
+}
+
+
+
+let skyboxGeo = new THREE.BoxGeometry(1000, 500, 1000);
+let skybox = new THREE.Mesh(skyboxGeo, skyboxMaterials);
+skybox.position.y = 248;
+scene.add(skybox);
+
 // Crear la camara
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
 
@@ -149,12 +176,6 @@ directionalLight.shadow.camera.right = 600;
 directionalLight.shadow.camera.top = 600;
 directionalLight.shadow.camera.bottom = -600;
 scene.add(directionalLight);
-
-// Añadir una luz puntual para asegurarse de que las sombras están correctamente configuradas
-const pointLight = new THREE.PointLight(0xff0000, 1, 100);
-pointLight.position.set(0, 50, 50);
-pointLight.castShadow = true;
-scene.add(pointLight);
 
 // Posición de la cámara
 camera.position.set(0, 300, 1000);
