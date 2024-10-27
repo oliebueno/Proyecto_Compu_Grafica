@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 const createCaterpillar = () => {
     const geometry = new THREE.BufferGeometry();
@@ -68,6 +68,16 @@ const createCaterpillar = () => {
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
     geometry.setIndex(indices);
+
+	// Cargar la textura
+    const loaderDDS = new DDSLoader();
+    const texture_1 = loaderDDS.load('src/texture/orugas.dds');
+    texture_1.wrapS = THREE.RepeatWrapping;
+    texture_1.wrapT = THREE.RepeatWrapping;
+    texture_1.repeat.set(1, 1);
+
+    // Crear el material de la oruga
+    const material = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide});
 
     // Crear la malla de la oruga derecha
     const caterpillarD = new THREE.Mesh(geometry, material);

@@ -43,7 +43,7 @@ const createForm = () => {
 
     // Cargar la textura
     const loaderDDS = new DDSLoader();
-    const texture_1 = loaderDDS.load('src/texture/piramide.dds');
+    const texture_1 = loaderDDS.load('src/texture/balas.dds');
     texture_1.wrapS = THREE.RepeatWrapping;
     texture_1.wrapT = THREE.RepeatWrapping;
     texture_1.repeat.set(1, 1);
@@ -55,7 +55,7 @@ const createForm = () => {
     return bulletBody;
 
 }
-// Se crea la bala con movimiento rectilineaexport function createLinearBullet(mountPoint) {
+// Se crea la bala con movimiento rectilineo
 	export function createLinearBullet(mountPoint) {
 		const lBullet = createForm();
 		lBullet.position.copy(mountPoint.getWorldPosition(new THREE.Vector3()));
