@@ -185,17 +185,69 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.update();
 
-// Función para disparar una bala
-function shootBullet(type) {
-    let bullet;
-    if (type === 'linear') {
-        bullet = createLinearBullet(mountPoint);
-    } else if (type === 'gravity') {
-        bullet = createGravityBullet(mountPoint);
-    }
-    bullets.push(bullet);
-    scene.add(bullet);
+// Variables de energía y proyectiles
+let energy = 100; // Energía inicial del tanque 
+let projectilesLeft = 20; // Número inicial de proyectiles
+
+function updateEnergyBar() { 
+    const energyBar = document.getElementById('energy-bar'); 
+    energyBar.style.width = `${energy}%`; 
 }
+
+// Llamar a esta función cada vez que la energía cambie 
+function decreaseEnergy(amount) { 
+    energy = Math.max(0, energy - amount); 
+    updateEnergyBar(); 
+}
+
+function updateProjectileCounter() {
+    const counter = document.getElementById('projectile-counter');
+    counter.innerText = `Proyectiles: ${projectilesLeft}`; 
+} 
+
+
+// Cargar el sprite de proyectiles
+const projectileSprite = loader.load('src/texture/balas.dds');
+
+const spriteMaterial = new THREE.SpriteMaterial({ map: projectileSprite });
+const projectileSpriteMesh = new THREE.Sprite(spriteMaterial);
+projectileSpriteMesh.position.set(50, 50, 0); // Posición del sprite en la interfaz
+projectileSpriteMesh.scale.set(50, 50, 1); // Tamaño del sprite
+
+// Añadir el sprite a la escena
+scene.add(projectileSpriteMesh);
+
+// Actualizar el sprite cuando cambia el número de proyectiles
+function updateProjectileSprite() {
+    // Lógica para actualizar el sprite según el número de proyectiles restantes
+    // Aquí podrías cambiar la posición o la visibilidad del sprite, por ejemplo
+    projectileSpriteMesh.visible = (projectilesLeft > 0);
+}
+
+// Llamar a esta función cada vez que el número de proyectiles cambie
+function shootBullet(type) {
+    if (projectilesLeft > 0) {
+        let bullet;
+        if (type === 'linear') {
+            bullet = createLinearBullet(mountPoint);
+        } else if (type === 'gravity') {
+            bullet = createGravityBullet(mountPoint);
+        }
+        bullets.push(bullet);
+        scene.add(bullet);
+
+        projectilesLeft--;
+        updateProjectileCounter();
+        updateProjectileSprite();
+        // Disminuir energía al disparar
+        decreaseEnergy(5); 
+    }
+}
+
+// Inicializar las barras y el contador al cargar la página 
+document.addEventListener('DOMContentLoaded', (event) => { 
+    updateEnergyBar(); updateProjectileCounter(); 
+});
 
 // Función para detectar colisiones
 function checkCollisionAABB(box1, box2) {
