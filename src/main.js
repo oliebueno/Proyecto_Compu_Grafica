@@ -66,7 +66,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-
 // Añadir el plano
 const plane = createPlane();
 plane.receiveShadow = true;
@@ -81,19 +80,16 @@ scene.add(tankBody);
 // Añadir el objective1
 const Objective1Body = createObjective1();
 Objective1Body.position.set(121, 50, -70);
-Objective1Body.castShadow = true;
 scene.add(Objective1Body);
 
 // Añadir el objective1_2
 const Objective1_2Body = createObjective1();
 Objective1_2Body.position.set(121, 50, 100);
-Objective1_2Body.castShadow = true;
 scene.add(Objective1_2Body);
 
 // Añadir el objective1_3
 const Objective1_3Body = createObjective1();
 Objective1_3Body.position.set(121, 50, 270);
-Objective1_3Body.castShadow = true;
 scene.add(Objective1_3Body);
 
 // Añadir el objective2
