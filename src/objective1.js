@@ -1,8 +1,7 @@
 import * as THREE from 'three';
-import { TextureLoader } from 'three';
 
 const createObjective1 = () => {
-    const loaderTexture = new TextureLoader();
+    const loaderTexture = new THREE.TextureLoader();
     const Objective1BodyGeometry = new THREE.BufferGeometry();
     
     const Objective1BodyVertices = new Float32Array([
@@ -116,7 +115,6 @@ const createObjective1 = () => {
         clearcoatRoughness: 0.1,
         emissiveIntensity: 0.5,
     });
-
 
     const Objective1Body = new THREE.Mesh(Objective1BodyGeometry, Objective1BodyMaterial);
 
