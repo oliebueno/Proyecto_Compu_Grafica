@@ -86,9 +86,6 @@ const createObjective2 = () => {
         roughness: 0.5,
         metalness: 0.1,
         side: THREE.DoubleSide,
-        reflectivity: 0.5,
-        clearcoat: 0.2,
-        clearcoatRoughness: 0.1,
         emissiveIntensity: 0.5,
     });
 

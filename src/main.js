@@ -95,19 +95,16 @@ scene.add(Objective1_3Body);
 // Añadir el objective2
 const Objective2Body = createObjective2();
 Objective2Body.position.set(-300, 0, -300);
-Objective2Body.castShadow = true;
 scene.add(Objective2Body);
 
 // Añadir el objective3
 const Objective3Body = createObjective3();
 Objective3Body.position.set(-121, 50, 100);
-Objective3Body.castShadow = true;
 scene.add(Objective3Body);
 
 // Añadir el objective3_2
 const Objective3_2Body = createObjective3();
 Objective3_2Body.position.set(-121, 50, 270);
-Objective3_2Body.castShadow = true;
 scene.add(Objective3_2Body);
 
 // Añadir blanco 1
