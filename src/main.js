@@ -5,6 +5,7 @@ import createObjective1 from './objective1';
 import createObjective2 from './objective2';
 import createObjective3 from './objective3';
 import createOval from './ballon';
+import { createAnimatedSprite} from './lifes';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -49,8 +50,6 @@ for(let i = 0; i < skyboxMaterials.length; i++) {
 	skyboxMaterials[i].side = THREE.BackSide;
 }
 
-
-
 let skyboxGeo = new THREE.BoxGeometry(1000, 500, 1000);
 let skybox = new THREE.Mesh(skyboxGeo, skyboxMaterials);
 skybox.position.y = 248;
@@ -58,6 +57,16 @@ scene.add(skybox);
 
 // Crear la camara
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+
+// Crear camara ortofrafica
+const ortCamera = new THREE.OrthographicCamera(
+    window.innerWidth/-2, window.innerWidth/2,
+    window.innerHeight/2, window.innerHeight/-2,
+    1, 1000
+) ;
+ortCamera.position.set(0, 0, 10);
+ortCamera.lookAt(new THREE.Vector3(0, 0, 0));
+scene.add(ortCamera);
 
 // Crear el render
 const canvas = document.getElementById('myCanvas')
@@ -198,6 +207,8 @@ function updateProjectileCounter() {
     counter.innerText = `Proyectiles: ${projectilesLeft}`; 
 } 
 
+// Crea el sprite de las vidas
+const lifeSprint = createAnimatedSprite(scene, 11, 1);
 
 // Cargar el sprite de proyectiles
 const projectileSprite = loader.load('src/texture/balas.dds');
@@ -393,9 +404,28 @@ function animate() {
 			cannon.rotation.x -= 0.01;
 		}
 	}
-	
+
+    // Renderizar la escena principal
+    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight); 
+    renderer.setScissor(0, 0, window.innerWidth, window.innerHeight); 
+    renderer.setScissorTest(false);
+	renderer.render(scene, camera);
+    renderer.clearDepth();
+
+    renderer.clearDepth();
+    // Renderizar la escena ortográfica
+    const hudWidth = 200; // Ancho de la región del HUD 
+    const hudHeight = 200; // Alto de la región del HUD 
+    renderer.setViewport(0, window.innerHeight - hudHeight, hudWidth, hudHeight); 
+    // Esquina superior izquierda 
+    renderer.setScissor(0, window.innerHeight - hudHeight, hudWidth, hudHeight);
+    renderer.setScissorTest(true);
+
 	updateBullets();
+    lifeSprint()
     controls.update();
-    renderer.render(scene, camera);
+    renderer.render(scene, ortCamera);
+    
+    
 }
 animate();
