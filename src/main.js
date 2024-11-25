@@ -15,6 +15,9 @@ import { Sequence } from 'three/examples/jsm/libs/tween.module.js';
 const MAX_ROTATION_X = Math.PI / 2; 
 const MIN_ROTATION_X = -Math.PI / 2;
 
+const DAY_DURATION = 5 * 60 * 1000; // El día dura 5 minutos
+let startTime = Date.now();
+
 const balloonSound = new Audio('src/Audios/explosion.mp3');
 const tankSound = new Audio('src/Audios/tanque.mp3');
 tankSound.loop = true;
@@ -67,7 +70,36 @@ let skybox = new THREE.Mesh(skyboxGeo, skyboxMaterials);
 skybox.position.y = 248;
 scene.add(skybox);
 
-// Crear la camara
+// Creación de los distintos tipos de camaras
+
+// Variables para las cámaras
+let cameraMode = 'third'; // 'first', 'third' o 'orbit'
+let activeCamera;
+
+const firstPersonCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+const thirdPersonCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+
+// Inicializa la cámara activa como la cámara de tercera persona
+activeCamera = thirdPersonCamera;
+
+// Actualiza la cámara de tercera persona
+function updateThirdPersonCamera() {
+    const distance = 200; // Distancia de la cámara al tanque
+    const height = 50; // Altura de la cámara
+    const offset = new THREE.Vector3(0, height, distance); // Desplazamiento desde el tanque
+
+    // Calcula la posición de la cámara
+    thirdPersonCamera.position.copy(tankBody.position).add(offset);
+    thirdPersonCamera.lookAt(tankBody.position);
+}
+
+// Actualiza la cámara de primera persona
+function updateFirstPersonCamera() {
+    firstPersonCamera.position.copy(tankBody.position).add(new THREE.Vector3(0, 20, 0)); // Ajusta la altura
+    firstPersonCamera.rotation.copy(tankBody.rotation); // Mantiene la misma rotación que el tanque
+}
+
+// Crear orbital
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
 
 // Crear el render
@@ -354,9 +386,50 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Captura eventos delteclado para cambiar de camara
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'KeyC') { // Cambiar entre cámaras al presionar 'C'
+        if (cameraMode === 'first') {
+            cameraMode = 'third';
+        } else if (cameraMode === 'third') {
+            cameraMode = 'orbit';
+        } else {
+            cameraMode = 'first';
+        }
+    }
+});
+
+// Crear un objeto que represente la luz (sol)
+const sunGeometry = new THREE.SphereGeometry(5, 32, 32); // Radio de la esfera
+const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); // Color amarillo
+const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+scene.add(sunMesh);
 
 function animate() {
     requestAnimationFrame(animate);
+
+    // Calcular el tiempo transcurrido desde el inicio
+    const elapsedTime = Date.now() - startTime;
+    const normalizedTime = (elapsedTime % DAY_DURATION) / DAY_DURATION; // Normaliza el tiempo entre 0 y 1
+
+    // Calcular la posición y el color de la luz direccional
+    const sunPosition = new THREE.Vector3(
+        Math.cos(normalizedTime * Math.PI * 2) * 500, // Ajusta el radio según sea necesario
+        Math.sin(normalizedTime * Math.PI * 2) * 500, // Ajusta el radio según sea necesario
+        300 // Altura del sol
+    );
+
+    directionalLight.position.copy(sunPosition);
+    sunMesh.position.copy(sunPosition); // Actualiza la posición del objeto que representa la luz
+
+    // Cambiar el color de la luz según el tiempo del día
+    const color = new THREE.Color();
+    color.setHSL(normalizedTime, 0.5, 0.5); // HSL: Hue (cambio de color), Saturation, Lightness
+    directionalLight.color.copy(color);
+
+    // Ajustar la intensidad de la luz ambiental entre 0.3 y 1
+    ambientLight.intensity = 0.3 + (0.7 * Math.abs(Math.cos(normalizedTime * Math.PI)));
+
 
     // Movimiento del tanque
     let isMoving = false;
@@ -444,7 +517,19 @@ function animate() {
     controls.update();
 
     renderer.autoClear = true;
-    renderer.render(scene, camera);
+
+    // Actualiza la posición de la cámara según el modo
+    if (cameraMode === 'first') {
+        updateFirstPersonCamera();
+        activeCamera = firstPersonCamera;
+    } else if (cameraMode === 'third') {
+        updateThirdPersonCamera();
+        activeCamera = thirdPersonCamera;
+    } else {
+        activeCamera = camera;
+    }
+    // Renderiza la escena con la cámara activa
+    renderer.render(scene, activeCamera);
 
     renderer.autoClear = false;
     renderer.render(sceneUI, cameraUI);
