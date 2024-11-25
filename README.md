@@ -1,4 +1,4 @@
-# Proyecto 1: Tanque y deteccion de colisiones
+# Proyecto 2: Tankmageddon
 
 
 ## Autores
@@ -8,11 +8,13 @@ Oliver Bueno 15-10192
 
 ## Descripción
 
-En el presente proyecto se construyo un plano con una mezcla de varias texturas, en el que se le anadieron diferentes elementos: - 5 paralelogramas (3 de una textura color marron y 2 con textura negra)
-- 1 piramide con una textura marron clara
-- Globos voladores encima del plano
-- Un vehiculo belico capaz de trasladarse y con una torreta capaz de disparar proyectiles
-
+- En esta parte del proyecto se trabajo con mapas de normales, además de ello se agreganron mapas de rugosidad y aomaps.
+- Se aborda también el cambio de iluminación de la luz direccional.
+- Se añadieron elementos basados en tipografía y creación/importación de mapa de sprites.
+- Se agregó una barra de energía para indicar la cantidad de proyectiles restantes.
+- Se implementaron las camaras en primera y tercera persona.
+- Se importo un modelo 3D, junto con sus texturas y materiales.
+- 
 ## Instrucciones para el manejo del tanque de guerra
 
 - Para desplazarse con el vehiculo presionar las cuatro flechas del teclado.
