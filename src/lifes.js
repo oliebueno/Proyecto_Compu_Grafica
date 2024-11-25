@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
 // Crea el sprite animado de las vidas
-export function createAnimatedSprite(scene, columns, rows) {
+export function createAnimatedSprite(scene, columns, rows, x, y, z) {
     const loader = new THREE.TextureLoader();
-    const texture = loader.load('src/Atlas/lifes.jpg', function () {
+    const texture = loader.load('src/Atlas/lifes.png', function () {
         texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
         texture.repeat.set(1 / columns, 1 / rows);
@@ -14,7 +14,7 @@ export function createAnimatedSprite(scene, columns, rows) {
         map: texture 
     });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.position.set(-window.innerWidth/2 + 50, window.innerHeight/2 - 50, 1);
+    sprite.position.set(x, y, z);
     sprite.scale.set(50, 50, 1);
     scene.add(sprite);
 

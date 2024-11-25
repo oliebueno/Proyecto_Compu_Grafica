@@ -6,8 +6,11 @@ import createObjective2 from './objective2';
 import createObjective3 from './objective3';
 import createOval from './ballon';
 import { createAnimatedSprite} from './lifes';
+import { createTextFromSpriteSheet } from './alphabet';
+import { createTextSequence } from './sequence';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { Sequence } from 'three/examples/jsm/libs/tween.module.js';
 
 const MAX_ROTATION_X = Math.PI / 2; 
 const MIN_ROTATION_X = -Math.PI / 2;
@@ -20,6 +23,15 @@ const cannonSound = new Audio('src/Audios/disparo.mp3');
 cannonSound.volume = 0.3;
 
 const bullets = [];
+
+// Crear scena para la IU
+const sceneUI = new THREE.Scene();
+const cameraUI = new THREE.OrthographicCamera(
+    window.innerWidth/-2, window.innerWidth/2,
+    window.innerHeight/2, window.innerHeight/-2,
+    1, 1000
+) ;
+cameraUI.position.z = 10;
 
 // Crear la escena
 const scene = new THREE.Scene();
@@ -57,16 +69,6 @@ scene.add(skybox);
 
 // Crear la camara
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
-
-// Crear camara ortofrafica
-const ortCamera = new THREE.OrthographicCamera(
-    window.innerWidth/-2, window.innerWidth/2,
-    window.innerHeight/2, window.innerHeight/-2,
-    1, 1000
-) ;
-ortCamera.position.set(0, 0, 10);
-ortCamera.lookAt(new THREE.Vector3(0, 0, 0));
-scene.add(ortCamera);
 
 // Crear el render
 const canvas = document.getElementById('myCanvas')
@@ -207,8 +209,39 @@ function updateProjectileCounter() {
     counter.innerText = `Proyectiles: ${projectilesLeft}`; 
 } 
 
-// Crea el sprite de las vidas
-const lifeSprint = createAnimatedSprite(scene, 11, 1);
+// Crea el sprite de las vidas (forma de fuego azul)
+const lifeSprint = createAnimatedSprite(sceneUI, 8, 2, window.innerWidth/2 - 70, window.innerHeight/2 - 50, 0);
+const lifeSprint2 = createAnimatedSprite(sceneUI, 8, 2, window.innerWidth/2 - 110, window.innerHeight/2 - 50, 0);
+const lifeSprint3 = createAnimatedSprite(sceneUI, 8, 2, window.innerWidth/2 - 150, window.innerHeight/2 - 50, 0);
+
+// Crea el sprite con la palabra "lifes" para indicar las vidas
+createTextFromSpriteSheet(
+    sceneUI, 
+    'lifes:3', 
+    8, 5, 
+    window.innerWidth/2 - 170, window.innerHeight/2 - 80, 0, 
+    20, 20,
+    'src/Atlas/alpha_2.png',
+    'abcdefghijklmnopqrstuvwxyz0123456789$:?!'
+);
+
+// Crear los sprite para la secuencia de inicio
+const sequences = [
+    {text: '  welcome to', duration: 2000},
+    {text: 'tankmageddon', duration: 3000},
+    {text: '       start', duration: 2000}
+]
+
+createTextSequence(
+    sceneUI,
+    sequences,
+    8, 5,
+    window.innerWidth/2 - 1400, window.innerHeight/2 - 250, 0,
+    80, 80,
+    'src/Atlas/alpha_2.png',
+    'abcdefghijklmnopqrstuvwxyz'
+
+)
 
 // Cargar el sprite de proyectiles
 const projectileSprite = loader.load('src/texture/balas.dds');
@@ -303,7 +336,6 @@ function updateBullets() {
         }
     }
 }
-
 
 // Captura de eventos del teclado
 const keyStates = {};
@@ -405,26 +437,17 @@ function animate() {
 		}
 	}
 
-    // Renderizar la escena principal
-    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight); 
-    renderer.setScissor(0, 0, window.innerWidth, window.innerHeight); 
-    renderer.setScissorTest(false);
-	renderer.render(scene, camera);
-    renderer.clearDepth();
-
-    renderer.clearDepth();
-    // Renderizar la escena ortográfica
-    const hudWidth = 200; // Ancho de la región del HUD 
-    const hudHeight = 200; // Alto de la región del HUD 
-    renderer.setViewport(0, window.innerHeight - hudHeight, hudWidth, hudHeight); 
-    // Esquina superior izquierda 
-    renderer.setScissor(0, window.innerHeight - hudHeight, hudWidth, hudHeight);
-    renderer.setScissorTest(true);
-
 	updateBullets();
-    lifeSprint()
+    lifeSprint();
+    lifeSprint2();
+    lifeSprint3();
     controls.update();
-    renderer.render(scene, ortCamera);
+
+    renderer.autoClear = true;
+    renderer.render(scene, camera);
+
+    renderer.autoClear = false;
+    renderer.render(sceneUI, cameraUI);
     
     
 }
