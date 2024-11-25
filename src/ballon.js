@@ -48,6 +48,7 @@ const createOval = () => {
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
     geometry.setIndex(indices);
+    geometry.computeVertexNormals();
 
 	// Cargar la textura
     const loaderDDS = new DDSLoader();

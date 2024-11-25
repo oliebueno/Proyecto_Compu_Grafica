@@ -10,10 +10,13 @@ import { createTextFromSpriteSheet } from './alphabet';
 import { createTextSequence } from './sequence';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { Sequence } from 'three/examples/jsm/libs/tween.module.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 const MAX_ROTATION_X = Math.PI / 2; 
 const MIN_ROTATION_X = -Math.PI / 2;
+
+const DAY_DURATION = 5 * 60 * 1000; // El día dura 5 minutos
+let startTime = Date.now();
 
 const balloonSound = new Audio('src/Audios/explosion.mp3');
 const tankSound = new Audio('src/Audios/tanque.mp3');
@@ -67,7 +70,36 @@ let skybox = new THREE.Mesh(skyboxGeo, skyboxMaterials);
 skybox.position.y = 248;
 scene.add(skybox);
 
-// Crear la camara
+// Creación de los distintos tipos de camaras
+
+// Variables para las cámaras
+let cameraMode = 'third'; // 'first', 'third' o 'orbit'
+let activeCamera;
+
+const firstPersonCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+const thirdPersonCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+
+// Inicializa la cámara activa como la cámara de tercera persona
+activeCamera = thirdPersonCamera;
+
+// Actualiza la cámara de tercera persona
+function updateThirdPersonCamera() {
+    const distance = 200; // Distancia de la cámara al tanque
+    const height = 50; // Altura de la cámara
+    const offset = new THREE.Vector3(0, height, distance); // Desplazamiento desde el tanque
+
+    // Calcula la posición de la cámara
+    thirdPersonCamera.position.copy(tankBody.position).add(offset);
+    thirdPersonCamera.lookAt(tankBody.position);
+}
+
+// Actualiza la cámara de primera persona
+function updateFirstPersonCamera() {
+    firstPersonCamera.position.copy(tankBody.position).add(new THREE.Vector3(0, 20, 0)); // Ajusta la altura
+    firstPersonCamera.rotation.copy(tankBody.rotation); // Mantiene la misma rotación que el tanque
+}
+
+// Crear orbital
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
 
 // Crear el render
@@ -85,7 +117,6 @@ scene.add(plane);
 // Añadir el tanque
 const {tankBody, turret, cannon, mountPoint} = createTankBody();
 tankBody.position.set(0, 18, 450);
-tankBody.castShadow = true;
 scene.add(tankBody);
 
 // Añadir el objective1
@@ -354,9 +385,77 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Captura eventos delteclado para cambiar de camara
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'KeyC') { // Cambiar entre cámaras al presionar 'C'
+        if (cameraMode === 'first') {
+            cameraMode = 'third';
+        } else if (cameraMode === 'third') {
+            cameraMode = 'orbit';
+        } else {
+            cameraMode = 'first';
+        }
+    }
+});
+
+// Crear un objeto que represente la luz 
+const sunGeometry = new THREE.SphereGeometry(5, 32, 32); 
+const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); 
+const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+scene.add(sunMesh);
+
+// Se carga el modelo 3D en formato FBX
+const fbxLoader = new FBXLoader();
+
+fbxLoader.load(
+    'src/Modelos/T 90.fbx',
+    (object) => {
+        scene.add(object);
+        object.position.set(0, 12, -300);
+        object.scale.set(0.15, 0.15, 0.15);
+
+        object.traverse((child) => {
+            if (child.isMesh) {
+                const textureLoader = new THREE.TextureLoader();
+                const texture = textureLoader.load('src/Modelos/T 90D.png');
+                child.material.map = texture;
+                child.material.needsUpdate = true;
+                child.castShadow = true;
+
+            }
+        });
+    },
+    (xhr) => {
+        console.log((xhr.loaded / xhr.total * 100) + '% cargado'); // Progreso de carga
+    },
+    (error) => {
+        console.error('Error al cargar el modelo:', error); // Manejo de errores
+    }
+);
 
 function animate() {
     requestAnimationFrame(animate);
+
+    // Calcular el tiempo transcurrido desde el inicio
+    const elapsedTime = Date.now() - startTime;
+    const normalizedTime = (elapsedTime % DAY_DURATION) / DAY_DURATION;
+
+    // Calcular la posición y el color de la luz direccional
+    const sunPosition = new THREE.Vector3(
+        Math.cos(normalizedTime * Math.PI * 2) * 500,
+        Math.sin(normalizedTime * Math.PI * 2) * 500,
+        300
+    );
+
+    directionalLight.position.copy(sunPosition);
+    sunMesh.position.copy(sunPosition);
+
+    // Cambiar el color de la luz según el tiempo del día
+    const color = new THREE.Color();
+    color.setHSL(normalizedTime, 0.5, 0.5);
+    directionalLight.color.copy(color);
+    ambientLight.intensity = 0.3 + (0.7 * Math.abs(Math.cos(normalizedTime * Math.PI)));
+
 
     // Movimiento del tanque
     let isMoving = false;
@@ -444,7 +543,19 @@ function animate() {
     controls.update();
 
     renderer.autoClear = true;
-    renderer.render(scene, camera);
+
+    // Actualiza la posición de la cámara según el modo
+    if (cameraMode === 'first') {
+        updateFirstPersonCamera();
+        activeCamera = firstPersonCamera;
+    } else if (cameraMode === 'third') {
+        updateThirdPersonCamera();
+        activeCamera = thirdPersonCamera;
+    } else {
+        activeCamera = camera;
+    }
+    // Renderiza la escena con la cámara activa
+    renderer.render(scene, activeCamera);
 
     renderer.autoClear = false;
     renderer.render(sceneUI, cameraUI);
