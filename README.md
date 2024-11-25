@@ -14,7 +14,7 @@ Oliver Bueno 15-10192
 - Se agregó una barra de energía para indicar la cantidad de proyectiles restantes.
 - Se implementaron las camaras en primera y tercera persona.
 - Se importo un modelo 3D, junto con sus texturas y materiales.
-- 
+
 ## Instrucciones para el manejo del tanque de guerra
 
 - Para desplazarse con el vehiculo presionar las cuatro flechas del teclado.
