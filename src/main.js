@@ -5,8 +5,12 @@ import createObjective1 from './objective1';
 import createObjective2 from './objective2';
 import createObjective3 from './objective3';
 import createOval from './ballon';
+import { createAnimatedSprite} from './lifes';
+import { createTextFromSpriteSheet } from './alphabet';
+import { createTextSequence } from './sequence';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { Sequence } from 'three/examples/jsm/libs/tween.module.js';
 
 const MAX_ROTATION_X = Math.PI / 2; 
 const MIN_ROTATION_X = -Math.PI / 2;
@@ -19,6 +23,15 @@ const cannonSound = new Audio('src/Audios/disparo.mp3');
 cannonSound.volume = 0.3;
 
 const bullets = [];
+
+// Crear scena para la IU
+const sceneUI = new THREE.Scene();
+const cameraUI = new THREE.OrthographicCamera(
+    window.innerWidth/-2, window.innerWidth/2,
+    window.innerHeight/2, window.innerHeight/-2,
+    1, 1000
+) ;
+cameraUI.position.z = 10;
 
 // Crear la escena
 const scene = new THREE.Scene();
@@ -48,8 +61,6 @@ skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_ft }));
 for(let i = 0; i < skyboxMaterials.length; i++) {
 	skyboxMaterials[i].side = THREE.BackSide;
 }
-
-
 
 let skyboxGeo = new THREE.BoxGeometry(1000, 500, 1000);
 let skybox = new THREE.Mesh(skyboxGeo, skyboxMaterials);
@@ -198,6 +209,39 @@ function updateProjectileCounter() {
     counter.innerText = `Proyectiles: ${projectilesLeft}`; 
 } 
 
+// Crea el sprite de las vidas (forma de fuego azul)
+const lifeSprint = createAnimatedSprite(sceneUI, 8, 2, window.innerWidth/2 - 70, window.innerHeight/2 - 50, 0);
+const lifeSprint2 = createAnimatedSprite(sceneUI, 8, 2, window.innerWidth/2 - 110, window.innerHeight/2 - 50, 0);
+const lifeSprint3 = createAnimatedSprite(sceneUI, 8, 2, window.innerWidth/2 - 150, window.innerHeight/2 - 50, 0);
+
+// Crea el sprite con la palabra "lifes" para indicar las vidas
+createTextFromSpriteSheet(
+    sceneUI, 
+    'lifes:3', 
+    8, 5, 
+    window.innerWidth/2 - 170, window.innerHeight/2 - 80, 0, 
+    20, 20,
+    'src/Atlas/alpha_2.png',
+    'abcdefghijklmnopqrstuvwxyz0123456789$:?!'
+);
+
+// Crear los sprite para la secuencia de inicio
+const sequences = [
+    {text: '  welcome to', duration: 2000},
+    {text: 'tankmageddon', duration: 3000},
+    {text: '       start', duration: 2000}
+]
+
+createTextSequence(
+    sceneUI,
+    sequences,
+    8, 5,
+    window.innerWidth/2 - 1400, window.innerHeight/2 - 250, 0,
+    80, 80,
+    'src/Atlas/alpha_2.png',
+    'abcdefghijklmnopqrstuvwxyz'
+
+)
 
 // Cargar el sprite de proyectiles
 const projectileSprite = loader.load('src/texture/balas.dds');
@@ -292,7 +336,6 @@ function updateBullets() {
         }
     }
 }
-
 
 // Captura de eventos del teclado
 const keyStates = {};
@@ -393,9 +436,19 @@ function animate() {
 			cannon.rotation.x -= 0.01;
 		}
 	}
-	
+
 	updateBullets();
+    lifeSprint();
+    lifeSprint2();
+    lifeSprint3();
     controls.update();
+
+    renderer.autoClear = true;
     renderer.render(scene, camera);
+
+    renderer.autoClear = false;
+    renderer.render(sceneUI, cameraUI);
+    
+    
 }
 animate();
