@@ -51,6 +51,7 @@ const createTurret = () => {
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
     geometry.setIndex(indices);
+    geometry.computeVertexNormals();
 
 	// Cargar la textura
     const loaderDDS = new DDSLoader();
@@ -66,6 +67,9 @@ const createTurret = () => {
     const turret = new THREE.Mesh(geometry, material);
     turret.position.set(0, 12, -20);
 	turret.rotation.y = Math.PI 
+
+    // Sombras
+    turret.castShadow = true;
 
     return turret;
 };

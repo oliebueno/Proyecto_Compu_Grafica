@@ -117,7 +117,6 @@ scene.add(plane);
 // Añadir el tanque
 const {tankBody, turret, cannon, mountPoint} = createTankBody();
 tankBody.position.set(0, 18, 450);
-tankBody.castShadow = true;
 scene.add(tankBody);
 
 // Añadir el objective1

@@ -59,6 +59,7 @@ const createTankBody = () => {
 
 	tankBodyGeometry.setAttribute('position', new THREE.BufferAttribute(tankBodyVertices, 3));
 	tankBodyGeometry.setAttribute('uv', new THREE.BufferAttribute(tankUVs, 2));
+	tankBodyGeometry.computeVertexNormals();
 
 	// Cargar la textura
     const loaderDDS = new DDSLoader();
@@ -88,6 +89,11 @@ const createTankBody = () => {
 	const {caterpillarD, caterpillarI} = createCaterpillar();
     tankBody.add(caterpillarD);
 	tankBody.add(caterpillarI);
+
+	// Sombras del cuerpo del tanque y las orugas
+	tankBody.castShadow = true;
+	caterpillarD.castShadow = true;
+	caterpillarI.castShadow = true;
 
 	return { tankBody, turret, cannon, mountPoint};
 }
