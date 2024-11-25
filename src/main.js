@@ -10,7 +10,7 @@ import { createTextFromSpriteSheet } from './alphabet';
 import { createTextSequence } from './sequence';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { Sequence } from 'three/examples/jsm/libs/tween.module.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 const MAX_ROTATION_X = Math.PI / 2; 
 const MIN_ROTATION_X = -Math.PI / 2;
@@ -398,35 +398,62 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Crear un objeto que represente la luz (sol)
-const sunGeometry = new THREE.SphereGeometry(5, 32, 32); // Radio de la esfera
-const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); // Color amarillo
+// Crear un objeto que represente la luz 
+const sunGeometry = new THREE.SphereGeometry(5, 32, 32); 
+const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); 
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 scene.add(sunMesh);
+
+// Se carga el modelo 3D en formato FBX
+const fbxLoader = new FBXLoader();
+
+fbxLoader.load(
+    'src/Modelos/T 90.fbx',
+    (object) => {
+        scene.add(object);
+        object.position.set(0, 12, -300);
+        object.scale.set(0.15, 0.15, 0.15);
+
+        object.traverse((child) => {
+            if (child.isMesh) {
+                const textureLoader = new THREE.TextureLoader();
+                const texture = textureLoader.load('src/Modelos/T 90D.png');
+                child.material.map = texture;
+                child.material.needsUpdate = true;
+                child.castShadow = true;
+
+            }
+        });
+    },
+    (xhr) => {
+        console.log((xhr.loaded / xhr.total * 100) + '% cargado'); // Progreso de carga
+    },
+    (error) => {
+        console.error('Error al cargar el modelo:', error); // Manejo de errores
+    }
+);
 
 function animate() {
     requestAnimationFrame(animate);
 
     // Calcular el tiempo transcurrido desde el inicio
     const elapsedTime = Date.now() - startTime;
-    const normalizedTime = (elapsedTime % DAY_DURATION) / DAY_DURATION; // Normaliza el tiempo entre 0 y 1
+    const normalizedTime = (elapsedTime % DAY_DURATION) / DAY_DURATION;
 
     // Calcular la posición y el color de la luz direccional
     const sunPosition = new THREE.Vector3(
-        Math.cos(normalizedTime * Math.PI * 2) * 500, // Ajusta el radio según sea necesario
-        Math.sin(normalizedTime * Math.PI * 2) * 500, // Ajusta el radio según sea necesario
-        300 // Altura del sol
+        Math.cos(normalizedTime * Math.PI * 2) * 500,
+        Math.sin(normalizedTime * Math.PI * 2) * 500,
+        300
     );
 
     directionalLight.position.copy(sunPosition);
-    sunMesh.position.copy(sunPosition); // Actualiza la posición del objeto que representa la luz
+    sunMesh.position.copy(sunPosition);
 
     // Cambiar el color de la luz según el tiempo del día
     const color = new THREE.Color();
-    color.setHSL(normalizedTime, 0.5, 0.5); // HSL: Hue (cambio de color), Saturation, Lightness
+    color.setHSL(normalizedTime, 0.5, 0.5);
     directionalLight.color.copy(color);
-
-    // Ajustar la intensidad de la luz ambiental entre 0.3 y 1
     ambientLight.intensity = 0.3 + (0.7 * Math.abs(Math.cos(normalizedTime * Math.PI)));
 
 
