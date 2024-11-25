@@ -20,6 +20,7 @@ En el presente proyecto se construyo un plano con una mezcla de varias texturas,
 - Para mover verticalmente el cañón presionar las teclas W y S
 - Para disparar los proyectiles con movimiento rectilineo presionar la tecla Q
 - Para disparar los proyectiles con movimiento parabolico presionar la tecla E
+- Para cambiar de vista/camara presionar la tecla C hasta encontrar la que mejor se adapte a tu gusto.
 
 DIVIERTETE APUNTANDO Y DISPARANDO CON TU MINI TANQUE DE GUERRA EN THREE.JS!!!!
 
