@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import createCylinderGeometry from './Geometries/cylinder';
+import createCylinderGeometry from '../Geometries/cylinder';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 const createCaterpillar = () => {

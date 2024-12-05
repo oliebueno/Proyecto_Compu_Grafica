@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import createPlane from './plane';
-import createTankBody from './tank';
+import createTankBody from './Tank/tank';
 import createObjective1 from './objective1';
 import createObjective2 from './objective2';
 import createObjective3 from './objective3';
