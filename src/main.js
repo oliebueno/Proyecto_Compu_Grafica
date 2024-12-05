@@ -11,6 +11,7 @@ import { createTextSequence } from './sequence';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { createSkybox } from './skybox';
 
 const MAX_ROTATION_X = Math.PI / 2; 
 const MIN_ROTATION_X = -Math.PI / 2;
@@ -46,29 +47,7 @@ loader.load('src/texture/cielo.jpg', function(texture) {
 });
 
 // Crear el skybox
-let skyboxMaterials = [];
-let texture_ft = new THREE.TextureLoader().load("src/texture/frente.png");
-let texture_bk = new THREE.TextureLoader().load("src/texture/atras.png");
-let texture_up = new THREE.TextureLoader().load("src/texture/arriba.png");
-let texture_dn = new THREE.TextureLoader().load("src/texture/abajo.png");
-let texture_rt = new THREE.TextureLoader().load("src/texture/derecha.png");
-let texture_lf = new THREE.TextureLoader().load("src/texture/izquierda.png");
-
-skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_rt }));
-skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_lf }));
-skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_up }));
-skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_dn }));
-skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_bk }));
-skyboxMaterials.push(new THREE.MeshBasicMaterial({ map: texture_ft }));
-
-for(let i = 0; i < skyboxMaterials.length; i++) {
-	skyboxMaterials[i].side = THREE.BackSide;
-}
-
-let skyboxGeo = new THREE.BoxGeometry(1000, 500, 1000);
-let skybox = new THREE.Mesh(skyboxGeo, skyboxMaterials);
-skybox.position.y = 248;
-scene.add(skybox);
+createSkybox(scene);
 
 // Creación de los distintos tipos de camaras
 
