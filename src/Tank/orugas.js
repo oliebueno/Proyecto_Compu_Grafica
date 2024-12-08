@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import createCylinderGeometry from '../Geometries/cylinder';
-import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 const createCaterpillar = () => {
     const radiusTop = 5;
@@ -15,14 +14,33 @@ const createCaterpillar = () => {
     geometry.computeVertexNormals();
 
 	// Cargar la textura
-    const loaderDDS = new DDSLoader();
-    const texture_1 = loaderDDS.load('src/texture/orugas.dds');
-    texture_1.wrapS = THREE.RepeatWrapping;
-    texture_1.wrapT = THREE.RepeatWrapping;
-    texture_1.repeat.set(1, 1);
+    const loaderTexture = new THREE.TextureLoader();
+
+    // Cargar textura principal
+    const texture_1 = loaderTexture.load('src/texture/Chainmail004_1K-JPG/Chainmail004_1K-JPG_Color.jpg');
+
+    // Cargar el mapa de normales
+    const normalMap = loaderTexture.load('src/texture/Chainmail004_1K-JPG/Chainmail004_1K-JPG_NormalGL.jpg');
+
+    // Cargar el mapa de rugosidad 
+    const roughnessMap = loaderTexture.load('src/texture/Chainmail004_1K-JPG/Chainmail004_1K-JPG_Roughness.jpg'); 
+
+    // Cargar el mapa de ID
+    const idMaskMap = loaderTexture.load('src/texture/Chainmail004_1K-JPG/Chainmail004_1K-JPG_IdMask.jpg');
 
     // Crear el material de la oruga
-    const material = new THREE.MeshStandardMaterial({ map: texture_1, side: THREE.DoubleSide});
+    const material =  new THREE.MeshStandardMaterial({ 
+        map: texture_1,
+        normalMap: normalMap,
+        roughnessMap: roughnessMap,
+        normalScale: new THREE.Vector2(3, 3),
+        roughness: 0.5,
+        metalness: 0.2,
+        side: THREE.DoubleSide,
+        emissiveIntensity: 0.5,
+        emissiveMap: idMaskMap
+    });
+
 
     // Crear la malla de la oruga derecha
     const caterpillarD = new THREE.Mesh(geometry, material);

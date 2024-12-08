@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import createTurret from './torreta';
 import createCannon from './cannon';
 import createCaterpillar from './orugas';
+import { createPhare } from './phare';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 
 // Cuerpo del tanque
@@ -80,7 +81,6 @@ const createTankBody = () => {
 	const turret = createTurret();
 	tankBody.add(turret);
 	
-
 	// Crear cañon
 	const {cannon, mountPoint} = createCannon();
     turret.add(cannon);
@@ -90,12 +90,20 @@ const createTankBody = () => {
     tankBody.add(caterpillarD);
 	tankBody.add(caterpillarI);
 
+	// Crear faro izquierdo
+	const l_phare = createPhare(11.5, 4, -39);
+	tankBody.add(l_phare);
+
+	// Crear faro derecho
+	const r_phare = createPhare(-11.5, 4, -39);
+	tankBody.add(r_phare);
+
 	// Sombras del cuerpo del tanque y las orugas
 	tankBody.castShadow = true;
 	caterpillarD.castShadow = true;
 	caterpillarI.castShadow = true;
 
-	return { tankBody, turret, cannon, mountPoint};
+	return { tankBody, turret, cannon, mountPoint, l_phare, r_phare };
 }
 
 export default createTankBody;
