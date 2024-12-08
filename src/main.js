@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as Model3D from './Modelos/load_Models';
 import createPlane from './plane';
 import createTankBody from './Tank/tank';
 import createObjective1 from './objective1';
@@ -10,7 +11,6 @@ import { createTextFromSpriteSheet } from './alphabet';
 import { createTextSequence } from './sequence';
 import { createLinearBullet, createGravityBullet } from './bullets';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { createSkybox } from './skybox';
 
 const MAX_ROTATION_X = Math.PI / 2; 
@@ -27,6 +27,9 @@ const cannonSound = new Audio('src/Audios/disparo.mp3');
 cannonSound.volume = 0.3;
 
 const bullets = [];
+
+// Estado inicial de las luces del tanque
+let lightsOn = 'low';
 
 // Crear scena para la IU
 const sceneUI = new THREE.Scene();
@@ -74,7 +77,7 @@ function updateThirdPersonCamera() {
 
 // Actualiza la cámara de primera persona
 function updateFirstPersonCamera() {
-    firstPersonCamera.position.copy(tankBody.position).add(new THREE.Vector3(0, 20, 0)); // Ajusta la altura
+    firstPersonCamera.position.copy(tankBody.position).add(new THREE.Vector3(0, 30, 0)); // Ajusta la altura
     firstPersonCamera.rotation.copy(tankBody.rotation); // Mantiene la misma rotación que el tanque
 }
 
@@ -94,7 +97,7 @@ plane.receiveShadow = true;
 scene.add(plane);
 
 // Añadir el tanque
-const {tankBody, turret, cannon, mountPoint} = createTankBody();
+const {tankBody, turret, cannon, mountPoint, l_phare, r_phare} = createTankBody();
 tankBody.position.set(0, 18, 450);
 scene.add(tankBody);
 
@@ -237,6 +240,7 @@ createTextFromSpriteSheet(
 
 // Crear los sprite para la secuencia de inicio
 const sequences = [
+    {text: '            ', duration: 3000},
     {text: '  welcome to', duration: 2000},
     {text: 'tankmageddon', duration: 3000},
     {text: '       start', duration: 2000}
@@ -347,7 +351,7 @@ function updateBullets() {
     }
 }
 
-// Captura de eventos del teclado
+// Captura de eventos del teclado----------------
 const keyStates = {};
 document.addEventListener('keydown', (event) => { keyStates[event.code] = true; });
 document.addEventListener('keyup', (event) => { keyStates[event.code] = false; });
@@ -377,43 +381,260 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Captura de eventos del teclado para enceder las luces del tanque
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'KeyL') {
+        updateLights();
+    }
+});
+
 // Crear un objeto que represente la luz 
 const sunGeometry = new THREE.SphereGeometry(5, 32, 32); 
 const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); 
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 scene.add(sunMesh);
 
-// Se carga el modelo 3D en formato FBX
-const fbxLoader = new FBXLoader();
+// Se crean las SpotLight para los faros del tanque
+const leftSpotLight = new THREE.SpotLight(0xffffff, 0, 400, Math.PI / 4, 0.5, 1);
+const rightSpotLight = new THREE.SpotLight(0xffffff, 0, 400, Math.PI / 4, 0.5, 1);
 
-fbxLoader.load(
-    'src/Modelos/T 90.fbx',
-    (object) => {
-        scene.add(object);
-        object.position.set(0, 12, -300);
-        object.scale.set(0.15, 0.15, 0.15);
+leftSpotLight.position.set(0, 0, 3); 
+rightSpotLight.position.set(0, 0, 3);
 
-        object.traverse((child) => {
-            if (child.isMesh) {
-                const textureLoader = new THREE.TextureLoader();
-                const texture = textureLoader.load('src/Modelos/T 90D.png');
-                child.material.map = texture;
-                child.material.needsUpdate = true;
-                child.castShadow = true;
+leftSpotLight.castShadow = true;
+rightSpotLight.castShadow = true;
 
-            }
-        });
-    },
-    (xhr) => {
-        console.log((xhr.loaded / xhr.total * 100) + '% cargado'); // Progreso de carga
-    },
-    (error) => {
-        console.error('Error al cargar el modelo:', error); // Manejo de errores
+r_phare.add(rightSpotLight);
+l_phare.add(leftSpotLight);
+
+
+// Función para actualizar el estado de las luces
+function updateLights() {
+    if (lightsOn === 'off') {
+        leftSpotLight.intensity = 0;
+        rightSpotLight.intensity = 0;
+        lightsOn = 'low';
+    } else if (lightsOn === 'low') {
+        leftSpotLight.intensity = 100;
+        rightSpotLight.intensity = 100;
+        lightsOn = 'medium';
+    } else if (lightsOn === 'medium') {
+        leftSpotLight.intensity = 500;
+        rightSpotLight.intensity = 500;
+        lightsOn = 'high';
+    } else if (lightsOn === 'high') {
+        leftSpotLight.intensity = 1000;
+        rightSpotLight.intensity = 1000;
+        lightsOn = 'off';
     }
-);
+}
+
+// Se carga el modelo 3D en formato FBX de un tanque
+Model3D.load_tank_1(scene);
+
+// Se carga el modelo 3D en formato FBX de las lamparas del lado derecho
+Model3D.load_lamp(scene, 110, 0, 355).then((lamp) => {
+
+    // Crear el PointLight
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, 110, 0, 185).then((lamp) => {
+
+    // Crear el PointLight
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, 110, 0, 15).then((lamp) => {
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, 110, 0, -155).then((lamp) => {
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, 110, 0, -325).then((lamp) => {
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+// Se carga el modelo 3D en formato FBX de las lamparas del lado izquierdo
+Model3D.load_lamp(scene, -110, 0, 355).then((lamp) => {
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, -110, 0, 185).then((lamp) => {
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, -110, 0, -155).then((lamp) => {
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, -110, 0, -325).then((lamp) => {
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+
+// Se carga el modelo 3D en formato FBX de las lamparas del cruce
+Model3D.load_lamp(scene, -170, 0, 35).then((lamp) => {
+    lamp.rotation.y = Math.PI / 2;
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, -340, 0, 35).then((lamp) => {
+    lamp.rotation.y = Math.PI / 2;
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, -170, 0, -110).then((lamp) => {
+    lamp.rotation.y = Math.PI / 2;
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
+Model3D.load_lamp(scene, -340, 0, -110).then((lamp) => {
+    lamp.rotation.y = Math.PI / 2;
+
+    // Crear el PointLight 1
+    const pointLight_1 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_1.position.set(0, 1030, 180);
+
+    // Crear el PointLight 2
+    const pointLight_2 = new THREE.PointLight(0xffff99, 5000, 100);
+    pointLight_2.position.set(0, 1030, -180);
+
+    lamp.add(pointLight_1);
+    lamp.add(pointLight_2);
+});
+
 
 function animate() {
     requestAnimationFrame(animate);
+
+    // Actualiza la dirección de las luces
+    leftSpotLight.target.position.copy(tankBody.position).add(new THREE.Vector3(0, 0, -100).applyQuaternion(tankBody.quaternion));
+    rightSpotLight.target.position.copy(tankBody.position).add(new THREE.Vector3(0, 0, -100).applyQuaternion(tankBody.quaternion));
+
+    // Asegúrate de que los objetivos de las luces se actualicen
+    leftSpotLight.target.updateMatrixWorld();
+    rightSpotLight.target.updateMatrixWorld();
+
+
 
     // Calcular el tiempo transcurrido desde el inicio
     const elapsedTime = Date.now() - startTime;
@@ -434,6 +655,14 @@ function animate() {
     color.setHSL(normalizedTime, 0.5, 0.5);
     directionalLight.color.copy(color);
     ambientLight.intensity = 0.3 + (0.7 * Math.abs(Math.cos(normalizedTime * Math.PI)));
+
+    // Controlar la intensidad de las luces de las lámparas
+    const lampIntensity = normalizedTime >= 0.5 && normalizedTime <= 0.8 ? 5000 : 0; // Cambia la intensidad según el tiempo
+    scene.traverse((object) => {
+        if (object instanceof THREE.PointLight) {
+            object.intensity = lampIntensity;
+        }
+    });
 
 
     // Movimiento del tanque
