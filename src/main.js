@@ -31,6 +31,9 @@ const bullets = [];
 // Estado inicial de las luces del tanque
 let lightsOn = 'low';
 
+// Estado inicial de la lluvia
+let rainEnabled = false;
+
 // Crear scena para la IU
 const sceneUI = new THREE.Scene();
 const cameraUI = new THREE.OrthographicCamera(
@@ -271,7 +274,6 @@ scene.add(projectileSpriteMesh);
 // Actualizar el sprite cuando cambia el número de proyectiles
 function updateProjectileSprite() {
     // Lógica para actualizar el sprite según el número de proyectiles restantes
-    // Aquí podrías cambiar la posición o la visibilidad del sprite, por ejemplo
     projectileSpriteMesh.visible = (projectilesLeft > 0);
 }
 
@@ -290,7 +292,6 @@ function shootBullet(type) {
         projectilesLeft--;
         updateProjectileCounter();
         updateProjectileSprite();
-        // Disminuir energía al disparar
         decreaseEnergy(5); 
     }
 }
@@ -312,6 +313,7 @@ function checkCollisionAABB(box1, box2) {
     return collisionX && collisionY && collisionZ;
 }
 
+// Función para actualizar los proyectiles
 function updateBullets() {
     for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];
@@ -336,6 +338,7 @@ function updateBullets() {
                 // Manejar la colisión
 				balloonSound.currentTime = 0;
 				balloonSound.play();
+                createExplosion(balloon.position);
                 scene.remove (bullet);
                 bullets.splice(i, 1);
                 scene.remove(balloon);
@@ -351,7 +354,9 @@ function updateBullets() {
     }
 }
 
-// Captura de eventos del teclado----------------
+// Captura de eventos del teclado-----------------
+
+// Captura de eventos del teclado para disparar
 const keyStates = {};
 document.addEventListener('keydown', (event) => { keyStates[event.code] = true; });
 document.addEventListener('keyup', (event) => { keyStates[event.code] = false; });
@@ -370,7 +375,7 @@ document.addEventListener('keydown', (event) => {
 
 // Captura eventos delteclado para cambiar de camara
 document.addEventListener('keydown', (event) => {
-    if (event.code === 'KeyC') { // Cambiar entre cámaras al presionar 'C'
+    if (event.code === 'KeyC') { 
         if (cameraMode === 'first') {
             cameraMode = 'third';
         } else if (cameraMode === 'third') {
@@ -388,7 +393,20 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Crear un objeto que represente la luz 
+// Captura de eventos del teclado para habilitar la nieve
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'KeyR') { 
+        rainEnabled = !rainEnabled;
+        if (rainEnabled) {
+            createRain();
+        } else {
+            scene.remove(rainParticles);
+            rainParticles = null;
+        }
+    }
+});
+
+// Crear un objeto que represente la luz del sol
 const sunGeometry = new THREE.SphereGeometry(5, 32, 32); 
 const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); 
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
@@ -408,7 +426,7 @@ r_phare.add(rightSpotLight);
 l_phare.add(leftSpotLight);
 
 
-// Función para actualizar el estado de las luces
+// Función para actualizar el estado de las luces del tanque
 function updateLights() {
     if (lightsOn === 'off') {
         leftSpotLight.intensity = 0;
@@ -435,11 +453,11 @@ Model3D.load_tank_1(scene);
 // Se carga el modelo 3D en formato FBX de las lamparas del lado derecho
 Model3D.load_lamp(scene, 110, 0, 355).then((lamp) => {
 
-    // Crear el PointLight
+    // Crear el PointLight 1
     const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
     pointLight_1.position.set(0, 1030, 180);
 
-    // Crear el PointLight
+    // Crear el PointLight 2
     const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
     pointLight_2.position.set(0, 1030, -180);
 
@@ -449,11 +467,11 @@ Model3D.load_lamp(scene, 110, 0, 355).then((lamp) => {
 
 Model3D.load_lamp(scene, 110, 0, 185).then((lamp) => {
 
-    // Crear el PointLight
+    // Crear el PointLight 1
     const pointLight_1 = new THREE.PointLight(0xffff99, 0, 100);
     pointLight_1.position.set(0, 1030, 180);
 
-    // Crear el PointLight
+    // Crear el PointLight 2
     const pointLight_2 = new THREE.PointLight(0xffff99, 0, 100);
     pointLight_2.position.set(0, 1030, -180);
 
@@ -622,9 +640,192 @@ Model3D.load_lamp(scene, -340, 0, -110).then((lamp) => {
     lamp.add(pointLight_2);
 });
 
+// Función para crear las partículas de nieve (al inicio eran de lluvia, por eso los nombres. Bueno, si se cambian los parametros pueden ser cualquier cosa jajajaj)
+let rainParticles = null;
+const rainCount = 500; // Número de partículas de lluvia
+
+function createRain() {
+    const positions = new Float32Array(rainCount * 3); // Posicion
+    const colors = new Float32Array(rainCount * 3);    // Colores
+    const sizes = new Float32Array(rainCount);         // Tamaños
+
+    for (let i = 0; i < rainCount; i++) {
+        // Posiciones
+        positions[i * 3] = (Math.random() - 0.5) * 1000;     // X
+        positions[i * 3 + 1] = Math.random() * 500;          // Y
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 1000; // Z
+
+        // Colores
+        colors[i * 3] = 0.8196;       // R
+        colors[i * 3 + 1] = 0.9176;   // G
+        colors[i * 3 + 2] = 1;        // B
+
+        // Tamaño de las partículas
+        sizes[i] = Math.random() + 1; 
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const material = new THREE.ShaderMaterial({
+        uniforms: {},
+        vertexShader: `
+            attribute vec3 color;
+            attribute float size;
+            varying vec3 vColor;
+
+            void main() {
+                vColor = color;
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
+                gl_PointSize = size;
+            }
+        `,
+        fragmentShader: `
+            varying vec3 vColor;
+
+            void main() {
+                gl_FragColor = vec4(vColor, 0.5);
+            }
+        `,
+        transparent: true,
+    });
+
+    rainParticles = new THREE.Points(geometry, material);
+    scene.add(rainParticles);
+}
+
+// Función para actualizar la nieve
+function updateRain() {
+    if (rainParticles) {
+        const positions = rainParticles.geometry.attributes.position.array;
+
+        for (let i = 0; i < rainCount; i++) {
+            // Velocidad de las particulas hacia abajo
+            positions[i * 3 + 1] -= (Math.random() + 0.5);
+
+            // Se reinian las posiciones de las particulas cuando tocan el plano(el suelo)
+            if (positions[i * 3 + 1] < 0) {
+                positions[i * 3 + 1] = Math.random() * 500;
+                positions[i * 3] = (Math.random() - 0.5) * 1000;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 1000;
+            }
+        }
+
+        rainParticles.geometry.attributes.position.needsUpdate = true;
+    }
+}
+
+// Función para crear las particulas de la explosión
+
+function createExplosion(position) {
+    const explosionCount = 500; // Número de partículas en la explosión
+    const positions = new Float32Array(explosionCount * 3);    // Posiciones 
+    const colors = new Float32Array(explosionCount * 3);       // Colores
+    const sizes = new Float32Array(explosionCount);            // Tamaños
+    const velocities = new Float32Array(explosionCount * 3);   // Velocidades
+
+    for (let i = 0; i < explosionCount; i++) {
+        // Se hace aleatorio la posición alrededor del centro de la explosión en una esfera
+        const theta = Math.random() * Math.PI * 2; 
+        const phi = Math.acos(Math.random() * 2 - 1); 
+        const radius = Math.random() * 50;
+
+        positions[i * 3] = position.x + radius * Math.sin(phi) * Math.cos(theta);     // X
+        positions[i * 3 + 1] = position.y + radius * Math.sin(phi) * Math.sin(theta); // Y
+        positions[i * 3 + 2] = position.z + radius * Math.cos(phi);                   // Z
+
+        // Establecer colores 
+        colors[i * 3] = Math.random();     // R
+        colors[i * 3 + 1] = Math.random(); // G
+        colors[i * 3 + 2] = Math.random(); // B
+
+        // Establecer el tamaño de las partículas
+        sizes[i] = Math.random() * 5 + 1; // Tamaño entre 1 y 6
+
+        // Asignar velocidad aleatoria a cada partícula
+        velocities[i * 3] = (Math.random() - 0.5) * 2; // Velocidad en X
+        velocities[i * 3 + 1] = (Math.random() - 0.5) * 2; // Velocidad en Y
+        velocities[i * 3 + 2] = (Math.random() - 0.5) * 2; // Velocidad en Z
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const material = new THREE.ShaderMaterial({
+        uniforms: {},
+        vertexShader: `
+            attribute vec3 color;
+            attribute float size;
+            varying vec3 vColor;
+
+            void main() {
+                vColor = color;
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
+                gl_PointSize = size;
+            }
+        `,
+        fragmentShader: `
+            varying vec3 vColor;
+
+            void main() {
+                gl_FragColor = vec4(vColor, 0.5);
+            }
+        `,
+        transparent: true,
+    });
+
+    const explosionParticles = new THREE.Points(geometry, material);
+    scene.add(explosionParticles);
+
+    // Animar la explosión
+    animateExplosion(explosionParticles, velocities);
+}
+
+// Función para animar la explosión
+function animateExplosion(particles, velocities) {
+    const duration = 1.5;
+    const startTime = Date.now();
+
+    function update() {
+        const elapsed = (Date.now() - startTime) / 1000;
+        if (elapsed < duration) {
+            const positions = particles.geometry.attributes.position.array;
+            const sizes = particles.geometry.attributes.size.array;
+
+            for (let i = 0; i < positions.length / 3; i++) {
+                positions[i * 3] += velocities[i * 3];         // Mover en X
+                positions[i * 3 + 1] += velocities[i * 3 + 1]; // Mover en Y
+                positions[i * 3 + 2] += velocities[i * 3 + 2]; // Mover en Z
+
+                // Desvanecer el tamaño de las partículas
+                sizes[i] *= 0.95;
+            }
+
+            particles.geometry.attributes.position.needsUpdate = true;
+            particles.geometry.attributes.size.needsUpdate = true;
+
+            requestAnimationFrame(update);
+        } else {
+            scene.remove(particles);
+        }
+    }
+
+    update();
+}
 
 function animate() {
     requestAnimationFrame(animate);
+
+    // Actualizar las partículas de nieve
+    if (rainEnabled) {
+        updateRain();
+    }
 
     // Actualiza la dirección de las luces
     leftSpotLight.target.position.copy(tankBody.position).add(new THREE.Vector3(0, 0, -100).applyQuaternion(tankBody.quaternion));
